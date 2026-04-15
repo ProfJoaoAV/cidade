@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Builder: English Prepositions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js Base -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Controlos Primeira Pessoa (agora adaptados para 3ª pessoa) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+    <!-- Carregador de ficheiros GLTF/GLB -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #87CEEB; /* Sky blue */
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .minecraft-font { font-family: 'Press Start 2P', cursive; }
+
+        .btn-minecraft {
+            background-color: #7d7d7d;
+            border: 4px solid #3b3b3b;
+            border-top-color: #b4b4b4;
+            border-left-color: #b4b4b4;
+            color: white;
+            text-shadow: 2px 2px #3b3b3b;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-minecraft:active {
+            border: 4px solid #b4b4b4;
+            border-top-color: #3b3b3b;
+            border-left-color: #3b3b3b;
+            transform: scale(0.98);
+        }
+
+        .btn-minecraft-green { background-color: #558b2f; }
+        .btn-minecraft-blue { background-color: #2196F3; }
+        .btn-minecraft-orange { background-color: #FF9800; }
+
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            width: 80vmin;
+            height: 80vmin;
+            background-color: #7cb342;
+            border: 4px solid #33691e;
+            box-shadow: 10px 10px rgba(0,0,0,0.3);
+            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.05) 75%, rgba(0,0,0,0.05)), repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 25%, #7cb342 25%, #7cb342 75%, rgba(0,0,0,0.05) 75%, rgba(0,0,0,0.05));
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+        }
+
+        .grid-cell {
+            border: 1px solid rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8vmin;
+            text-shadow: 1px 1px 0 #fff;
+        }
+        .grid-cell:hover { background-color: rgba(255,255,255,0.4) !important; }
+
+        .category-tab {
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: bold;
+            color: #ddd;
+        }
+        .category-tab.active { color: white; border-bottom-color: #FFEB3B; }
+
+        .tool-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border: 2px solid #555;
+            cursor: pointer;
+            background-color: #c6c6c6;
+            border-top-color: #fff;
+            border-left-color: #fff;
+        }
+        .tool-btn:hover { background-color: #dfdfdf; }
+        .tool-btn.active {
+            background-color: #FFF9C4;
+            border: 2px solid #3b3b3b;
+            border-top-color: #555;
+            border-left-color: #555;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Removi a mira (crosshair) porque em 3ª pessoa não é usada */
+        
+        .instruction-box {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #FFF;
+            border: 4px solid #555;
+            border-top-color: #aaa;
+            border-left-color: #aaa;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px #000;
+        }
+
+        .highlight-prep { color: #55FF55; font-weight: bold; text-decoration: underline; }
+        .highlight-place { color: #55FFFF; font-weight: bold; }
+        
+        .tools-scroll::-webkit-scrollbar { width: 8px; }
+        .tools-scroll::-webkit-scrollbar-track { background: #3b3b3b; }
+        .tools-scroll::-webkit-scrollbar-thumb { background: #7d7d7d; border: 1px solid #3b3b3b; }
+
+        #loading-overlay {
+            background: #87CEEB url('https://www.transparenttextures.com/patterns/cubes.png');
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #loading-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="w-full h-screen relative">
+
+    <div id="loading-overlay" class="absolute inset-0 z-[100] hidden">
+        <h1 class="minecraft-font text-3xl text-white mb-4 text-shadow-md" style="text-shadow: 2px 2px #000;">Loading City...</h1>
+        <div class="w-64 h-6 bg-gray-800 border-2 border-white p-1">
+            <div id="loading-bar" class="h-full bg-green-500 w-0"></div>
+        </div>
+        <p id="loading-text" class="text-white mt-2 font-bold">A carregar modelos 3D...</p>
+        
+        <button onclick="enter3D()" class="btn-minecraft bg-red-600 mt-8 text-xs hover:bg-red-500">Forçar Entrada (Ignorar Erros)</button>
+    </div>
+
+    <div id="main-menu" class="absolute inset-0 flex flex-col items-center justify-center bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-[#87CEEB] z-50">
+        <h1 class="minecraft-font text-4xl text-white text-center mb-10 text-shadow-md" style="text-shadow: 4px 4px #000;">
+            CRAFT & LEARN
+        </h1>
+        <p class="text-xl font-bold mb-8 text-white bg-black bg-opacity-70 p-4 border-2 border-gray-400 text-center">
+            Places in a town & Prepositions<br>
+            <span class="text-sm font-normal text-gray-300">Construção em Blocos & Modelos 3D</span>
+        </p>
+        
+        <div class="flex flex-col gap-4 w-64">
+            <button onclick="startGame('free')" class="btn-minecraft minecraft-font text-sm">Free Build</button>
+            <button onclick="startGame('guided_place')" class="btn-minecraft btn-minecraft-blue minecraft-font text-sm">Mission: Place</button>
+            <button onclick="startGame('guided_move')" class="btn-minecraft btn-minecraft-orange minecraft-font text-sm">Mission: Move</button>
+        </div>
+    </div>
+
+    <div id="build-screen" class="absolute inset-0 flex items-center justify-center bg-[#87CEEB] hidden z-40 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        <div class="absolute top-4 left-4">
+            <button onclick="showMenu()" class="btn-minecraft text-sm">⬅ Back</button>
+        </div>
+
+        <div class="flex gap-8 w-full max-w-7xl p-4 items-start justify-center h-full pt-16">
+            
+            <div class="flex flex-col gap-2 bg-[#3b3b3b] p-4 border-4 border-[#555] border-t-[#aaa] border-l-[#aaa] w-80 h-[80vmin] flex-shrink-0">
+                <h2 class="minecraft-font text-white text-xs text-center mb-2">City Places</h2>
+                
+                <div class="flex text-xs mb-2 border-b border-gray-600 overflow-x-auto pb-1">
+                    <div class="category-tab active" onclick="setCategory('basic')">Basic</div>
+                    <div class="category-tab" onclick="setCategory('services')">Services</div>
+                    <div class="category-tab" onclick="setCategory('shops')">Shops</div>
+                    <div class="category-tab" onclick="setCategory('leisure')">Leisure</div>
+                </div>
+
+                <div id="tools-container" class="grid grid-cols-2 gap-2 overflow-y-auto tools-scroll flex-grow pr-2">
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center">
+                <div id="instruction-panel" class="instruction-box mb-4 hidden w-full max-w-2xl">
+                </div>
+                
+                <div id="grid-container"></div>
+                
+                <div class="mt-4 flex gap-4 w-full justify-between px-2">
+                    <button onclick="clearGrid()" class="btn-minecraft bg-red-600 text-sm border-red-400">Clear Map</button>
+                    <button onclick="startLoading3D()" class="btn-minecraft btn-minecraft-green text-lg py-3 px-6 minecraft-font text-xs animate-pulse">PLAY 3D ➔</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ui-3d" class="absolute inset-0 pointer-events-none hidden z-30">
+        <div id="instruction-panel-3d" class="absolute top-10 left-1/2 transform -translate-x-1/2 instruction-box hidden pointer-events-auto w-auto px-8">
+        </div>
+
+        <div id="start-3d-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 pointer-events-auto">
+            <h2 class="minecraft-font text-white text-2xl mb-6 text-center leading-relaxed text-shadow-md">World Generated!</h2>
+            <p class="text-white text-lg mb-8 bg-gray-800 p-4 border border-gray-500">
+                <b>W A S D</b> or <b>Arrows</b> = Walk<br>
+                <b>Mouse</b> = Look around
+            </p>
+            <button id="btn-lock-pointer" class="btn-minecraft btn-minecraft-green text-xl minecraft-font">ENTER CITY</button>
+            <button onclick="exit3D()" class="btn-minecraft mt-6">Exit to Map</button>
+        </div>
+        
+        <div class="absolute top-4 left-4 pointer-events-auto">
+            <p class="text-white text-xs bg-black bg-opacity-70 p-2 border border-gray-500 mb-2 font-bold">Press [ESC] to free mouse</p>
+            <button onclick="exit3D()" class="btn-minecraft bg-red-600 border-red-800 hidden" id="btn-exit-3d">Exit 3D</button>
+        </div>
+    </div>
+
+    <div id="canvas-container" class="absolute inset-0 z-10 hidden"></div>
+
+    <script>
+        const BUILDINGS = {
+            0: { id: 0, category: 'none', name: 'Grass', color: '#558b2f', icon: '', type: 'floor' },
+            1: { id: 1, category: 'basic', name: 'Road', color: '#666666', icon: '🛣️', type: 'road' },
+            2: { id: 2, category: 'basic', name: 'Park', color: '#2e7d32', icon: '🌳', type: 'nature', height: 1.5 },
+            3: { id: 3, category: 'services', name: 'School', color: '#c62828', icon: '🏫', type: 'building', height: 3.5 },
+            4: { id: 4, category: 'services', name: 'Hospital', color: '#ffffff', icon: '🏥', type: 'building', height: 5 },
+            5: { id: 5, category: 'services', name: 'Police Station', color: '#1565c0', icon: '🚓', type: 'building', height: 3 },
+            6: { id: 6, category: 'services', name: 'Fire Station', color: '#d32f2f', icon: '🚒', type: 'building', height: 3 },
+            7: { id: 7, category: 'services', name: 'Bank', color: '#78909c', icon: '💰', type: 'building', height: 4 },
+            8: { id: 8, category: 'services', name: 'Airport', color: '#90a4ae', icon: '✈️', type: 'building', height: 2 },
+            9:  { id: 9, category: 'shops', name: 'Bakery', color: '#ffb300', icon: '🍞', type: 'model', modelUrl: 'https://profjoaoav.github.io/cidade/Bakery.glb' },
+            10: { id: 10, category: 'shops', name: 'Supermarket', color: '#00838f', icon: '🛒', type: 'building', height: 2.5 },
+            11: { id: 11, category: 'shops', name: 'Butcher\'s', color: '#e57373', icon: '🥩', type: 'building', height: 2 },
+            12: { id: 12, category: 'shops', name: 'Chemist\'s', color: '#4caf50', icon: '💊', type: 'building', height: 2.2 },
+            13: { id: 13, category: 'shops', name: 'Shoe Shop', color: '#795548', icon: '👞', type: 'building', height: 2 },
+            14: { id: 14, category: 'shops', name: 'Clothes Shop', color: '#9c27b0', icon: '👕', type: 'building', height: 2.5 },
+            15: { id: 15, category: 'leisure', name: 'Cinema', color: '#311b92', icon: '🎬', type: 'building', height: 3.5 },
+            16: { id: 16, category: 'leisure', name: 'Museum', color: '#eeeeee', icon: '🏛️', type: 'building', height: 4 },
+            17: { id: 17, category: 'leisure', name: 'Stadium', color: '#43a047', icon: '⚽', type: 'model', modelUrl: 'https://profjoaoav.github.io/cidade/Football-stadium.glb' },
+            18: { id: 18, category: 'leisure', name: 'Zoo', color: '#827717', icon: '🦁', type: 'nature', height: 2 }
+        };
+
+        const GRID_SIZE = 20;
+        const BLOCK_SIZE = 10;
+        let grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+        let currentTool = 1;
+        let currentMode = 'free';
+        let activeCategory = 'basic';
+        
+        const placeMissions = [
+            { text: "Put the <span class='highlight-place'>Bakery</span> <span class='highlight-prep'>next to</span> the <span class='highlight-place'>Bank</span>.", setup: () => { clearGrid(); grid[10][10] = 7; renderGrid(); setCategory('shops'); currentTool = 9; renderTools(); }, check: () => checkAdjacency(9, 7) },
+            { text: "Put a <span class='highlight-place'>Park</span> <span class='highlight-prep'>between</span> the <span class='highlight-place'>School</span> and the <span class='highlight-place'>Chemist's</span>.", setup: () => { clearGrid(); grid[10][8] = 3; grid[10][12] = 12; renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => checkBetween(2, 3, 12) },
+            { text: "Put the <span class='highlight-place'>Stadium</span> <span class='highlight-prep'>opposite</span> the <span class='highlight-place'>Police Station</span> (across the road).", setup: () => { clearGrid(); for(let i=0; i<GRID_SIZE; i++) grid[i][10] = 1; grid[10][9] = 5; renderGrid(); setCategory('leisure'); currentTool = 17; renderTools(); }, check: () => checkOpposite(17, 5, 1) }
+        ];
+        let currentMissionIndex = 0;
+
+        const moveMissions = [
+            { text: "Walk <span class='highlight-prep'>towards</span> the <span class='highlight-place'>Stadium</span>.", targetId: 17, check: (dist) => dist < 20 },
+            { text: "Walk <span class='highlight-prep'>through</span> the <span class='highlight-place'>Park</span>.", targetId: 2, check: (dist, inObj) => inObj === 2 },
+            { text: "Walk <span class='highlight-prep'>along</span> the <span class='highlight-place'>Road</span>.", targetId: 1, check: (dist, inObj, playerPos, startPos) => inObj === 1 && Math.abs(playerPos.z - startPos.z) > 40 },
+            { text: "Walk <span class='highlight-prep'>across</span> the road to the <span class='highlight-place'>Bakery</span>.", targetId: 9, check: (dist) => dist < 15 }
+        ];
+        let moveMissionStartPos = null;
+
+        let scene, camera, renderer, controls;
+        let gameBlocks = [];
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let prevTime = performance.now();
+        
+        // --- Variáveis de Terceira Pessoa ---
+        let playerPos = new THREE.Vector3(0, 0, 0);
+        let playerMesh = null; // O modelo GLB do jogador
+
+        let animationFrameId;
+
+        let gltfLoader;
+        const loadedModels = {}; 
+
+        function initUI() {
+            const gridEl = document.getElementById('grid-container');
+            gridEl.innerHTML = '';
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.id = `cell-${x}-${y}`;
+                    cell.onmousedown = (e) => handleGridInteraction(x, y, e);
+                    cell.onmouseenter = (e) => { if(e.buttons === 1) handleGridInteraction(x, y, e); }
+                    gridEl.appendChild(cell);
+                }
+            }
+            renderTools();
+            renderGrid();
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            renderTools();
+        }
+
+        function renderTools() {
+            const toolsContainer = document.getElementById('tools-container');
+            toolsContainer.innerHTML = '';
+            
+            Object.values(BUILDINGS).forEach(b => {
+                if (b.category === activeCategory) {
+                    const btn = document.createElement('div');
+                    btn.className = `tool-btn ${b.id === currentTool ? 'active' : ''}`;
+                    btn.onclick = () => { currentTool = b.id; renderTools(); };
+                    const is3D = b.type === 'model' ? '<span class="text-[8px] bg-blue-600 text-white px-1 rounded absolute top-1 right-1">3D</span>' : '';
+                    
+                    btn.innerHTML = `
+                        <div class="relative w-full text-center">
+                            ${is3D}
+                            <div class="text-3xl mb-1">${b.icon}</div>
+                            <div class="text-[10px] font-bold text-gray-800 break-words leading-tight h-6 flex items-center justify-center">${b.name}</div>
+                            <div class="w-full h-2 mt-1 border border-black" style="background-color: ${b.color}"></div>
+                        </div>
+                    `;
+                    toolsContainer.appendChild(btn);
+                }
+            });
+        }
+
+        function handleGridInteraction(x, y, e) {
+            if (e.button === 2 || (e.buttons === 2)) grid[y][x] = 0;
+            else grid[y][x] = currentTool;
+            renderGrid();
+            if (currentMode === 'guided_place') checkPlaceMission();
+        }
+
+        document.getElementById('grid-container').addEventListener('contextmenu', e => e.preventDefault());
+
+        function renderGrid() {
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const cell = document.getElementById(`cell-${x}-${y}`);
+                    const blockId = grid[y][x];
+                    if (blockId === 0) {
+                        cell.style.backgroundColor = 'transparent';
+                        cell.innerHTML = '';
+                    } else {
+                        cell.style.backgroundColor = BUILDINGS[blockId].color;
+                        cell.innerHTML = BUILDINGS[blockId].icon;
+                    }
+                }
+            }
+        }
+
+        function clearGrid() {
+            grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+            renderGrid();
+        }
+
+        function showMenu() {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('build-screen').classList.add('hidden');
+            exit3D();
+        }
+
+        function startGame(mode) {
+            currentMode = mode;
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('build-screen').classList.remove('hidden');
+            const panel = document.getElementById('instruction-panel');
+            
+            if (mode === 'free') {
+                panel.classList.add('hidden');
+                clearGrid();
+            } else if (mode === 'guided_place') {
+                panel.classList.remove('hidden');
+                currentMissionIndex = 0;
+                loadPlaceMission();
+            } else if (mode === 'guided_move') {
+                setupAdventureMap();
+                startLoading3D();
+            }
+        }
+
+        function loadPlaceMission() {
+            const m = placeMissions[currentMissionIndex];
+            document.getElementById('instruction-panel').innerHTML = 
+                `<div class="text-sm text-gray-400 mb-1">Mission ${currentMissionIndex + 1}/${placeMissions.length}</div>` + m.text;
+            m.setup();
+        }
+
+        function checkPlaceMission() {
+            if(placeMissions[currentMissionIndex].check()) {
+                document.getElementById('instruction-panel').innerHTML = `<span class="text-green-400 font-bold text-2xl">Awesome! Creeper is happy! 🟩</span>`;
+                setTimeout(() => {
+                    currentMissionIndex++;
+                    if (currentMissionIndex < placeMissions.length) loadPlaceMission();
+                    else document.getElementById('instruction-panel').innerHTML = `Missions Complete! Click <b>PLAY 3D</b>.`;
+                }, 2000);
+            }
+        }
+
+        function checkAdjacency(id1, id2) {
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=0; x<GRID_SIZE; x++) {
+                    if(grid[y][x] === id1) {
+                        if (x>0 && grid[y][x-1]===id2) return true;
+                        if (x<GRID_SIZE-1 && grid[y][x+1]===id2) return true;
+                        if (y>0 && grid[y-1][x]===id2) return true;
+                        if (y<GRID_SIZE-1 && grid[y+1][x]===id2) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function checkBetween(targetId, border1, border2) {
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=1; x<GRID_SIZE-1; x++) {
+                    if(grid[y][x] === targetId && ((grid[y][x-1]===border1 && grid[y][x+1]===border2) || (grid[y][x-1]===border2 && grid[y][x+1]===border1))) return true;
+                }
+            }
+            for(let x=0; x<GRID_SIZE; x++) {
+                for(let y=1; y<GRID_SIZE-1; y++) {
+                    if(grid[y][x] === targetId && ((grid[y-1][x]===border1 && grid[y+1][x]===border2) || (grid[y-1][x]===border2 && grid[y+1][x]===border1))) return true;
+                }
+            }
+            return false;
+        }
+
+        function checkOpposite(id1, id2, separator) {
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=0; x<GRID_SIZE-2; x++) {
+                    if(grid[y][x]===id1 && grid[y][x+1]===separator && grid[y][x+2]===id2) return true;
+                    if(grid[y][x]===id2 && grid[y][x+1]===separator && grid[y][x+2]===id1) return true;
+                }
+            }
+            return false;
+        }
+
+        function setupAdventureMap() {
+            clearGrid();
+            for(let i=0; i<GRID_SIZE; i++) grid[i][10] = 1; 
+            for(let i=0; i<GRID_SIZE; i++) grid[10][i] = 1; 
+            grid[15][10] = 0; 
+            
+            grid[5][8] = 2; grid[5][9] = 2; grid[6][8] = 2; grid[6][9] = 2; 
+            grid[10][8] = 9; 
+            grid[2][10] = 17; 
+            grid[12][10] = 5; 
+        }
+
+        function createMinecraftTexture(size, drawFunction) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            drawFunction(ctx, size);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
+            return tex;
+        }
+
+        function getGrassTexture() {
+            return createMinecraftTexture(16, (ctx, s) => {
+                const colors = ['#558b2f', '#33691e', '#689f38', '#4caf50'];
+                for(let y=0; y<s; y++) {
+                    for(let x=0; x<s; x++) {
+                        ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)];
+                        ctx.fillRect(x,y,1,1);
+                    }
+                }
+            });
+        }
+
+        function getRoadTexture() {
+            return createMinecraftTexture(16, (ctx, s) => {
+                ctx.fillStyle = '#666'; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = '#999'; ctx.fillRect(0,0,s,2); ctx.fillRect(0,14,s,2);
+                ctx.fillRect(0,0,2,s); ctx.fillRect(14,0,2,s);
+                ctx.fillStyle = '#555';
+                for(let i=0; i<30; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 1, 1);
+                ctx.fillStyle = 'white'; ctx.fillRect(7,2,2,4); ctx.fillRect(7,10,2,4);
+                ctx.fillRect(2,7,4,2); ctx.fillRect(10,7,4,2);
+            });
+        }
+
+        function getBuildingTexture(bData) {
+            return createMinecraftTexture(16, (ctx, s) => {
+                ctx.fillStyle = bData.color; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = 'rgba(0,0,0,0.1)';
+                for(let y=0; y<s; y+=4) ctx.fillRect(0, y, s, 1);
+                for(let x=0; x<s; x+=4) ctx.fillRect(x, 0, 1, s);
+                ctx.fillStyle = '#81d4fa';
+                if(bData.category === 'shops') {
+                    ctx.fillRect(2, 6, 12, 10); ctx.fillStyle = '#fff'; ctx.fillRect(3, 7, 10, 8); 
+                } else {
+                    ctx.fillRect(2, 2, 4, 4); ctx.fillRect(10, 2, 4, 4);
+                    ctx.fillRect(2, 10, 4, 4); ctx.fillRect(10, 10, 4, 4);
+                }
+                if(bData.name === 'Hospital') {
+                    ctx.fillStyle = 'red'; ctx.fillRect(6, 6, 4, 10); ctx.fillRect(3, 9, 10, 4);
+                }
+            });
+        }
+
+        function getLeafTexture() {
+            return createMinecraftTexture(16, (ctx, s) => {
+                const colors = ['#1b5e20', '#2e7d32', '#388e3c', '#000'];
+                for(let y=0; y<s; y++) {
+                    for(let x=0; x<s; x++) {
+                        ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)];
+                        ctx.fillRect(x,y,1,1);
+                    }
+                }
+            });
+        }
+
+        async function startLoading3D() {
+            document.getElementById('build-screen').classList.add('hidden');
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.remove('hidden');
+            const bar = document.getElementById('loading-bar');
+            const text = document.getElementById('loading-text');
+
+            const neededUrls = new Set();
+            for(let y=0; y<GRID_SIZE; y++){
+                for(let x=0; x<GRID_SIZE; x++){
+                    const id = grid[y][x];
+                    if(BUILDINGS[id] && BUILDINGS[id].type === 'model') {
+                        neededUrls.add(BUILDINGS[id].modelUrl);
+                    }
+                }
+            }
+            
+            // Adicionar obrigatoriamente o modelo do jogador!
+            const playerUrl = 'https://profjoaoav.github.io/cidade/player.glb';
+            neededUrls.add(playerUrl);
+
+            if (!gltfLoader) gltfLoader = new THREE.GLTFLoader();
+
+            const totalToLoad = neededUrls.size;
+            let loadedCount = 0;
+            text.innerText = `A descarregar ${totalToLoad} modelo(s) 3D...`;
+
+            const loadPromises = Array.from(neededUrls).map(url => {
+                if (loadedModels[url]) {
+                    loadedCount++; bar.style.width = `${(loadedCount / totalToLoad) * 100}%`;
+                    return Promise.resolve();
+                }
+
+                return new Promise((resolve) => {
+                    const timeoutId = setTimeout(() => {
+                        console.warn("Timeout a carregar:", url);
+                        loadedCount++; bar.style.width = `${(loadedCount / totalToLoad) * 100}%`;
+                        resolve(); 
+                    }, 8000);
+
+                    gltfLoader.load(
+                        url, 
+                        (gltf) => {
+                            clearTimeout(timeoutId);
+                            loadedModels[url] = gltf.scene;
+                            loadedCount++; bar.style.width = `${(loadedCount / totalToLoad) * 100}%`;
+                            resolve();
+                        }, 
+                        undefined, 
+                        (err) => {
+                            clearTimeout(timeoutId);
+                            console.error("Erro a carregar modelo", url, err);
+                            loadedCount++; bar.style.width = `${(loadedCount / totalToLoad) * 100}%`;
+                            resolve(); 
+                        }
+                    );
+                });
+            });
+
+            await Promise.all(loadPromises);
+            text.innerText = "A construir a cidade...";
+            setTimeout(enter3D, 500); 
+        }
+
+        function init3D() {
+            if(scene) return; 
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.Fog(0x87CEEB, 30, 100);
+
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: false }); 
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio > 1 ? 1 : 1); 
+            document.getElementById('canvas-container').innerHTML = '';
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            dirLight.position.set(50, 100, 50);
+            scene.add(dirLight);
+
+            controls = new THREE.PointerLockControls(camera, renderer.domElement);
+            
+            document.getElementById('btn-lock-pointer').addEventListener('click', () => controls.lock());
+
+            controls.addEventListener('lock', () => {
+                document.getElementById('start-3d-overlay').classList.add('hidden');
+                document.getElementById('btn-exit-3d').classList.remove('hidden');
+                
+                if(currentMode === 'guided_move') {
+                    currentMissionIndex = 0;
+                    moveMissionStartPos = playerPos.clone();
+                    loadMoveMission();
+                }
+            });
+
+            controls.addEventListener('unlock', () => {
+                if(document.getElementById('canvas-container').classList.contains('hidden')) return;
+                document.getElementById('start-3d-overlay').classList.remove('hidden');
+            });
+
+            scene.add(controls.getObject());
+
+            const onKeyDown = (e) => {
+                switch(e.code){ case 'ArrowUp': case 'KeyW': moveForward = true; break; case 'ArrowLeft': case 'KeyA': moveLeft = true; break; case 'ArrowDown': case 'KeyS': moveBackward = true; break; case 'ArrowRight': case 'KeyD': moveRight = true; break; }
+            };
+            const onKeyUp = (e) => {
+                switch(e.code){ case 'ArrowUp': case 'KeyW': moveForward = false; break; case 'ArrowLeft': case 'KeyA': moveLeft = false; break; case 'ArrowDown': case 'KeyS': moveBackward = false; break; case 'ArrowRight': case 'KeyD': moveRight = false; break; }
+            };
+            document.addEventListener('keydown', onKeyDown); document.addEventListener('keyup', onKeyUp);
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createTextSprite(message) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512; canvas.height = 128;
+            
+            context.fillStyle = "rgba(0, 0, 0, 0.5)";
+            context.fillRect(0, 0, 512, 128);
+            context.strokeStyle = "white"; context.lineWidth = 4; context.strokeRect(0, 0, 512, 128);
+
+            context.font = "Bold 40px 'Courier New'"; context.fillStyle = "white";
+            context.textAlign = "center"; context.textBaseline = "middle";
+            context.fillText(message, 256, 64);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false }); 
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(8, 2, 1);
+            return sprite;
+        }
+
+        function buildCity3D() {
+            gameBlocks.forEach(b => scene.remove(b));
+            if (playerMesh) scene.remove(playerMesh);
+            gameBlocks = [];
+
+            const grassTex = getGrassTexture();
+            grassTex.repeat.set(GRID_SIZE, GRID_SIZE); grassTex.wrapS = THREE.RepeatWrapping; grassTex.wrapT = THREE.RepeatWrapping;
+            
+            const floorGeo = new THREE.PlaneGeometry(GRID_SIZE * BLOCK_SIZE * 2, GRID_SIZE * BLOCK_SIZE * 2);
+            const floorMat = new THREE.MeshLambertMaterial({ map: grassTex });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+            const roadTex = getRoadTexture();
+
+            // === INSTANCIAR O JOGADOR ===
+            playerPos.set(0, 0, 0); // Posição inicial no centro do mapa
+            const playerUrl = 'https://profjoaoav.github.io/cidade/player.glb';
+            if (loadedModels[playerUrl]) {
+                const rawModel = loadedModels[playerUrl].clone();
+                const box = new THREE.Box3().setFromObject(rawModel);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const targetScale = 4 / maxDim; // A altura do jogador será de 4 blocos de Threejs
+                
+                // Agrupar para centrar perfeitamente o eixo no chão
+                playerMesh = new THREE.Group();
+                rawModel.scale.set(targetScale, targetScale, targetScale);
+                const center = box.getCenter(new THREE.Vector3());
+                const bottom = box.min.y;
+                rawModel.position.set(-center.x * targetScale, -bottom * targetScale, -center.z * targetScale);
+                
+                playerMesh.add(rawModel);
+                scene.add(playerMesh);
+            } else {
+                // Bloco temporário se o modelo do jogador falhar o download
+                const geo = new THREE.BoxGeometry(2, 4, 2);
+                const mat = new THREE.MeshLambertMaterial({color: 0x0000ff});
+                playerMesh = new THREE.Mesh(geo, mat);
+                playerMesh.position.y = 2; // Metade da altura
+                scene.add(playerMesh);
+            }
+
+            // === INSTANCIAR O MUNDO ===
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const id = grid[y][x];
+                    if (id === 0) continue;
+
+                    const bData = BUILDINGS[id];
+                    const posX = (x * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                    const posZ = (y * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+
+                    if (bData.type === 'model' && loadedModels[bData.modelUrl]) {
+                        const model = loadedModels[bData.modelUrl].clone();
+                        const box = new THREE.Box3().setFromObject(model);
+                        const size = box.getSize(new THREE.Vector3());
+                        const maxDim = Math.max(size.x, size.z);
+                        const targetScale = bData.name === 'Stadium' ? (BLOCK_SIZE * 2) / maxDim : BLOCK_SIZE / maxDim;
+                        
+                        model.scale.set(targetScale, targetScale, targetScale);
+                        const center = box.getCenter(new THREE.Vector3());
+                        model.position.set(posX - (center.x * targetScale), 0, posZ - (center.z * targetScale));
+                        
+                        scene.add(model);
+
+                        const sprite = createTextSprite(bData.name);
+                        sprite.position.set(posX, 12, posZ);
+                        scene.add(sprite);
+
+                        const colGeo = new THREE.BoxGeometry(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                        const colMat = new THREE.MeshBasicMaterial({visible: false});
+                        const colMesh = new THREE.Mesh(colGeo, colMat);
+                        colMesh.position.set(posX, 5, posZ);
+                        colMesh.userData = { id: id, isSolid: true, x, y };
+                        scene.add(colMesh);
+                        gameBlocks.push(colMesh);
+
+                    } else if (bData.type === 'road') {
+                        const geo = new THREE.PlaneGeometry(BLOCK_SIZE, BLOCK_SIZE);
+                        const mat = new THREE.MeshStandardMaterial({ map: roadTex });
+                        const mesh = new THREE.Mesh(geo, mat);
+                        mesh.rotation.x = -Math.PI / 2; mesh.position.set(posX, 0.05, posZ);
+                        scene.add(mesh);
+                        mesh.userData = { id: id, x, y };
+                        gameBlocks.push(mesh);
+                    } else {
+                        const height = (bData.height || 2.5) * 5; 
+                        const geo = new THREE.BoxGeometry(BLOCK_SIZE, height, BLOCK_SIZE);
+                        const tex = bData.type === 'nature' ? getLeafTexture() : getBuildingTexture(bData);
+                        const mat = new THREE.MeshStandardMaterial({ map: tex });
+                        const mesh = new THREE.Mesh(geo, mat);
+                        mesh.position.set(posX, height / 2, posZ);
+                        scene.add(mesh);
+
+                        const sprite = createTextSprite(bData.name);
+                        sprite.position.y = (height / 2) + 2.5;
+                        mesh.add(sprite);
+
+                        mesh.userData = { id: id, isSolid: true, x, y };
+                        gameBlocks.push(mesh);
+                    }
+                }
+            }
+            
+            // Colocar a câmara inicialmente a olhar em frente (sem rotação estranha)
+            camera.rotation.set(0, 0, 0);
+        }
+
+        function enter3D() {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('canvas-container').classList.remove('hidden');
+            document.getElementById('ui-3d').classList.remove('hidden');
+            init3D();
+            buildCity3D();
+            
+            if(currentMode === 'guided_move') document.getElementById('instruction-panel-3d').classList.remove('hidden');
+            else document.getElementById('instruction-panel-3d').classList.add('hidden');
+            
+            animate();
+        }
+
+        function exit3D() {
+            if (controls) controls.unlock();
+            cancelAnimationFrame(animationFrameId);
+            document.getElementById('canvas-container').classList.add('hidden');
+            document.getElementById('ui-3d').classList.add('hidden');
+            document.getElementById('build-screen').classList.remove('hidden');
+            if (currentMode === 'guided_move') showMenu();
+        }
+
+        function onWindowResize() {
+            if(!camera || !renderer) return;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function checkCollisions(newPosition) {
+            const playerRadius = 1.0; // Encurtado um pouco para facilitar a passagem em ruas
+            for (let i = 0; i < gameBlocks.length; i++) {
+                if (!gameBlocks[i].userData.isSolid) continue;
+                const box = new THREE.Box3().setFromObject(gameBlocks[i]);
+                box.expandByScalar(playerRadius);
+                if (box.containsPoint(newPosition)) return true;
+            }
+            const limit = (GRID_SIZE * BLOCK_SIZE) / 2;
+            if (Math.abs(newPosition.x) > limit || Math.abs(newPosition.z) > limit) return true;
+            return false;
+        }
+
+        function getDistanceToNearest(targetId) {
+            let minDist = Infinity;
+            const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+            for(let y=0; y<GRID_SIZE; y++){
+                for(let x=0; x<GRID_SIZE; x++){
+                    if(grid[y][x] === targetId) {
+                        const wX = (x * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                        const wZ = (y * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                        // A distância é medida em relação ao JOGADOR agora, e não à câmara
+                        const dist = Math.sqrt(Math.pow(playerPos.x - wX, 2) + Math.pow(playerPos.z - wZ, 2));
+                        if(dist < minDist) minDist = dist;
+                    }
+                }
+            }
+            return minDist;
+        }
+
+        function getGridPosFromWorld(worldPos) {
+            const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+            const x = Math.floor((worldPos.x + offset) / BLOCK_SIZE);
+            const z = Math.floor((worldPos.z + offset) / BLOCK_SIZE);
+            if (x >= 0 && x < GRID_SIZE && z >= 0 && z < GRID_SIZE) return grid[z][x];
+            return 0;
+        }
+
+        function loadMoveMission() {
+            if (currentMissionIndex >= moveMissions.length) {
+                document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font">YOU DID IT!</span>`;
+                setTimeout(exit3D, 3000);
+                return;
+            }
+            const m = moveMissions[currentMissionIndex];
+            document.getElementById('instruction-panel-3d').innerHTML = m.text;
+            moveMissionStartPos = playerPos.clone();
+        }
+
+        function checkMoveMissions() {
+            if(currentMode !== 'guided_move' || currentMissionIndex >= moveMissions.length) return;
+            const m = moveMissions[currentMissionIndex];
+            const dist = getDistanceToNearest(m.targetId);
+            const inObj = getGridPosFromWorld(playerPos);
+
+            if (m.check(dist, inObj, playerPos, moveMissionStartPos)) {
+                document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font text-xl">NICE!</span>`;
+                currentMissionIndex++;
+                setTimeout(loadMoveMission, 2000);
+            }
+        }
+
+        function animate() {
+            animationFrameId = requestAnimationFrame(animate);
+            const time = performance.now();
+
+            if (controls && controls.isLocked === true) {
+                const delta = (time - prevTime) / 1000;
+                
+                // Direções baseadas na perspetiva da Câmara
+                const camDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+                camDir.y = 0; camDir.normalize();
+                const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+                camRight.y = 0; camRight.normalize();
+
+                const moveVec = new THREE.Vector3();
+                if (moveForward) moveVec.add(camDir);
+                if (moveBackward) moveVec.sub(camDir);
+                if (moveLeft) moveVec.sub(camRight);
+                if (moveRight) moveVec.add(camRight);
+
+                // Rodar suavemente o boneco para a direção de movimento
+                if (moveVec.lengthSq() > 0 && playerMesh) {
+                    moveVec.normalize();
+                    const targetAngle = Math.atan2(moveVec.x, moveVec.z);
+                    let diff = targetAngle - playerMesh.rotation.y;
+                    // Normalizar a rotação para evitar que o boneco rode do avesso
+                    while(diff < -Math.PI) diff += Math.PI * 2;
+                    while(diff > Math.PI) diff -= Math.PI * 2;
+                    playerMesh.rotation.y += diff * 10 * delta;
+                }
+
+                // Calcular Velocidade e Movimento do Jogador (WASD)
+                const speed = 25.0; // Velocidade tipo sprint Minecraft
+                const velocity = moveVec.clone().multiplyScalar(speed * delta);
+                const nextPos = playerPos.clone().add(velocity);
+
+                // Sistema de Colisão Avançado (Permite deslizar pelas paredes)
+                if (!checkCollisions(nextPos)) {
+                    playerPos.copy(nextPos);
+                } else {
+                    const nextPosX = playerPos.clone(); nextPosX.x += velocity.x;
+                    const nextPosZ = playerPos.clone(); nextPosZ.z += velocity.z;
+                    
+                    if (!checkCollisions(nextPosX)) playerPos.copy(nextPosX);
+                    else if (!checkCollisions(nextPosZ)) playerPos.copy(nextPosZ);
+                }
+
+                // Atualizar Posição do Boneco no Mundo 3D
+                if (playerMesh) playerMesh.position.copy(playerPos);
+
+                // --- SISTEMA DE CÂMARA EM 3ª PESSOA ---
+                const pivotOffset = new THREE.Vector3(0, 3.5, 0); // Onde a câmara foca (altura dos ombros/cabeça)
+                const cameraOffset = new THREE.Vector3(0, 0, 12); // Distância para trás do boneco
+                
+                // Rodar o "braço" da câmara consoante a direção para onde estamos a olhar com o rato
+                cameraOffset.applyQuaternion(camera.quaternion);
+                
+                // Colocar a câmara na posição final
+                camera.position.copy(playerPos).add(pivotOffset).add(cameraOffset);
+                
+                // Impedir que a câmara desça abaixo do chão
+                if (camera.position.y < 0.5) camera.position.y = 0.5;
+
+                checkMoveMissions();
+            }
+            prevTime = time;
+            if(renderer && scene && camera) renderer.render(scene, camera);
+        }
+
+        initUI();
+    </script>
+</body>
+</html>
