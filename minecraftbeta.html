@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Builder: English Prepositions</title>
+    <title>City Craft: English Prepositions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Three.js Base -->
@@ -93,14 +93,20 @@
             background-color: #c6c6c6;
             border-top-color: #fff;
             border-left-color: #fff;
+            position: relative;
         }
-        .tool-btn:hover { background-color: #dfdfdf; }
-        .tool-btn.active {
+        .tool-btn:hover:not(.locked) { background-color: #dfdfdf; }
+        .tool-btn.active:not(.locked) {
             background-color: #FFF9C4;
             border: 2px solid #3b3b3b;
             border-top-color: #555;
             border-left-color: #555;
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        .tool-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
         }
         
         .instruction-box {
@@ -113,6 +119,7 @@
             text-align: center;
             font-size: 1.2rem;
             text-shadow: 2px 2px #000;
+            position: relative;
         }
 
         .highlight-prep { color: #55FF55; font-weight: bold; text-decoration: underline; }
@@ -143,6 +150,22 @@
         #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
         #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
 
+        /* Minimapa 3D */
+        #minimap-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            border: 4px solid #555;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #7cb342;
+            z-index: 40;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
         /* Estilos do Livro de Estudo */
         .study-book {
             background-color: #fdf6e3;
@@ -163,7 +186,8 @@
         }
         .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
         .vocab-item { background: #fff; padding: 8px; border: 1px solid #d7ccc8; border-radius: 4px; display: flex; justify-content: space-between; }
-        .vocab-en { font-weight: bold; color: #1565c0; }
+        .vocab-en { font-weight: bold; color: #1565c0; cursor: pointer; transition: color 0.2s; }
+        .vocab-en:hover { color: #d32f2f; text-decoration: underline; }
         .vocab-pt { color: #555; font-size: 0.9em; }
 
         /* Estilo para Níveis */
@@ -195,9 +219,22 @@
         
         <div class="flex flex-col gap-4 w-80">
             <button onclick="openStudyRoom()" class="btn-minecraft btn-minecraft-purple minecraft-font text-sm hover:scale-105">📚 Study Room</button>
-            <button onclick="startGame('free')" class="btn-minecraft minecraft-font text-sm hover:scale-105">1. Free Build</button>
-            <button onclick="startGame('guided_place')" class="btn-minecraft btn-minecraft-blue minecraft-font text-sm hover:scale-105">2. Mission: Builder</button>
-            <button onclick="startGame('guided_move')" class="btn-minecraft btn-minecraft-orange minecraft-font text-sm hover:scale-105">3. Mission: Explorer</button>
+            <div>
+                <button onclick="startGame('free')" class="btn-minecraft minecraft-font text-sm hover:scale-105 w-full relative">
+                    1. Free Build
+                    <span class="absolute top-0 right-0 -mt-2 -mr-2 text-xs bg-yellow-400 text-black px-1 rounded rounded font-bold border border-black shadow">Unlocks 🔒</span>
+                </button>
+            </div>
+            <div>
+                <button onclick="startGame('guided_place')" class="btn-minecraft btn-minecraft-blue minecraft-font text-sm hover:scale-105 w-full">2. Mission: Builder</button>
+                <div id="menu-builder-progress" class="text-center mt-1"></div>
+            </div>
+            <div>
+                <button onclick="startGame('guided_move')" class="btn-minecraft btn-minecraft-orange minecraft-font text-sm hover:scale-105 w-full">3. Mission: Explorer</button>
+                <div id="menu-explorer-progress" class="text-center mt-1"></div>
+            </div>
+            <button onclick="toggleCharacter()" id="btn-char-select-menu" class="btn-minecraft text-xs hover:scale-105 w-full" style="background-color:#9c27b0;border-color:#7b1fa2;margin-top:8px;">👤 Avatar: Filipe</button>
+            <button onclick="resetProgress()" class="btn-minecraft text-xs hover:scale-105 w-full" style="background-color:#5d4037;border-color:#3e2723;margin-top:8px;">🗑️ Apagar Progresso</button>
         </div>
     </div>
 
@@ -209,61 +246,64 @@
             <div class="flex text-lg bg-[#d7ccc8] rounded-t-lg pt-2 px-2 gap-2">
                 <button onclick="switchStudyTab('places')" id="tab-places" class="study-tab-btn active px-6 py-2 rounded-t-lg">City Places & Shops</button>
                 <button onclick="switchStudyTab('directions')" id="tab-directions" class="study-tab-btn px-6 py-2 rounded-t-lg">Directions & Prepositions</button>
+                <button onclick="switchStudyTab('quiz')" id="tab-quiz" class="study-tab-btn px-6 py-2 rounded-t-lg">⚡ Flash Quiz (Spaced)</button>
             </div>
 
             <div id="content-places" class="flex-grow p-6 overflow-y-auto">
-                <h2 class="text-2xl font-bold mb-4 text-[#c62828] border-b-2 border-[#c62828] pb-2">City Places & Shops</h2>
+                <h2 class="text-2xl font-bold mb-4 text-[#c62828] border-b-2 border-[#c62828] pb-2 flex justify-between">
+                    <span>City Places & Shops</span>
+                    <span class="text-sm font-normal text-gray-500 mt-2">Dica: Clica na palavra inglesa para ouvir a pronúncia! 🔊</span>
+                </h2>
                 <div class="grid grid-cols-2 gap-8">
                     <div>
                         <h3 class="font-bold text-lg mb-2 text-gray-800">Public Places & Services</h3>
                         <div class="vocab-grid">
-                            <div class="vocab-item"><span class="vocab-en">Airport</span><span class="vocab-pt">Aeroporto</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Bank</span><span class="vocab-pt">Banco</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Café</span><span class="vocab-pt">Café</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Church</span><span class="vocab-pt">Igreja</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Cinema</span><span class="vocab-pt">Cinema</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Fire station</span><span class="vocab-pt">Quartel de bombeiros</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Hospital</span><span class="vocab-pt">Hospital</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Hotel</span><span class="vocab-pt">Hotel</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Library</span><span class="vocab-pt">Biblioteca</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Museum</span><span class="vocab-pt">Museu</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Park</span><span class="vocab-pt">Parque</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Police station</span><span class="vocab-pt">Esquadra da polícia</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Post office</span><span class="vocab-pt">Estação dos correios</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Restaurant</span><span class="vocab-pt">Restaurante</span></div>
-                            <div class="vocab-item"><span class="vocab-en">School</span><span class="vocab-pt">Escola</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Stadium</span><span class="vocab-pt">Estádio</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Theatre</span><span class="vocab-pt">Teatro</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Train station</span><span class="vocab-pt">Estação de comboios</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Zoo</span><span class="vocab-pt">Jardim zoológico</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Bar</span><span class="vocab-pt">Bar</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Airport')">Airport</span><span class="vocab-pt">Aeroporto</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Bank')">Bank</span><span class="vocab-pt">Banco</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Café')">Café</span><span class="vocab-pt">Café</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Church')">Church</span><span class="vocab-pt">Igreja</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Cinema')">Cinema</span><span class="vocab-pt">Cinema</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Fire station')">Fire station</span><span class="vocab-pt">Quartel de bombeiros</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Hospital')">Hospital</span><span class="vocab-pt">Hospital</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Hotel')">Hotel</span><span class="vocab-pt">Hotel</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Library')">Library</span><span class="vocab-pt">Biblioteca</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Museum')">Museum</span><span class="vocab-pt">Museu</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Park')">Park</span><span class="vocab-pt">Parque</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Police station')">Police station</span><span class="vocab-pt">Esquadra da polícia</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Post office')">Post office</span><span class="vocab-pt">Estação dos correios</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Restaurant')">Restaurant</span><span class="vocab-pt">Restaurante</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('School')">School</span><span class="vocab-pt">Escola</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Stadium')">Stadium</span><span class="vocab-pt">Estádio</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Theatre')">Theatre</span><span class="vocab-pt">Teatro</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Train station')">Train station</span><span class="vocab-pt">Estação de comboios</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Zoo')">Zoo</span><span class="vocab-pt">Jardim zoológico</span></div>
                         </div>
                     </div>
                     <div>
                         <h3 class="font-bold text-lg mb-2 text-gray-800">Shops (Lojas)</h3>
                         <div class="vocab-grid mb-6">
-                            <div class="vocab-item"><span class="vocab-en">Bakery</span><span class="vocab-pt">Padaria</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Bookshop</span><span class="vocab-pt">Livraria</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Butcher's</span><span class="vocab-pt">Talho</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Chemist's</span><span class="vocab-pt">Farmácia</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Clothes shop</span><span class="vocab-pt">Loja de roupa</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Flower shop</span><span class="vocab-pt">Florista</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Gift shop</span><span class="vocab-pt">Loja de lembranças</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Newsagent's</span><span class="vocab-pt">Quiosque</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Pet shop</span><span class="vocab-pt">Loja de animais</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Shoe shop</span><span class="vocab-pt">Sapataria</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Sports shop</span><span class="vocab-pt">Loja de desporto</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Supermarket</span><span class="vocab-pt">Supermercado</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Bakery')">Bakery</span><span class="vocab-pt">Padaria</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Bookshop')">Bookshop</span><span class="vocab-pt">Livraria</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Butcher\'s')">Butcher's</span><span class="vocab-pt">Talho</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Chemist\'s')">Chemist's</span><span class="vocab-pt">Farmácia</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Clothes shop')">Clothes shop</span><span class="vocab-pt">Loja de roupa</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Flower shop')">Flower shop</span><span class="vocab-pt">Florista</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Gift shop')">Gift shop</span><span class="vocab-pt">Loja de lembranças</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Newsagent\'s')">Newsagent's</span><span class="vocab-pt">Quiosque</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Pet shop')">Pet shop</span><span class="vocab-pt">Loja de animais</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Shoe shop')">Shoe shop</span><span class="vocab-pt">Sapataria</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Sports shop')">Sports shop</span><span class="vocab-pt">Loja de desporto</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Supermarket')">Supermarket</span><span class="vocab-pt">Supermercado</span></div>
                         </div>
                         <h3 class="font-bold text-lg mb-2 text-gray-800">Types of Houses</h3>
                         <div class="vocab-grid">
-                            <div class="vocab-item"><span class="vocab-en">Block of flats</span><span class="vocab-pt">Prédio</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Caravan</span><span class="vocab-pt">Rulote</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Cottage</span><span class="vocab-pt">Casa de campo</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Detached house</span><span class="vocab-pt">Vivenda</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Semi-detached</span><span class="vocab-pt">Geminada</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Terraced house</span><span class="vocab-pt">Banda</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Skyscraper</span><span class="vocab-pt">Arranha-céus</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Block of flats')">Block of flats</span><span class="vocab-pt">Prédio</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Caravan')">Caravan</span><span class="vocab-pt">Rulote</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Cottage')">Cottage</span><span class="vocab-pt">Casa de campo</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Detached house')">Detached house</span><span class="vocab-pt">Vivenda</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Semi-detached')">Semi-detached</span><span class="vocab-pt">Geminada</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Terraced house')">Terraced house</span><span class="vocab-pt">Banda</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Skyscraper')">Skyscraper</span><span class="vocab-pt">Arranha-céus</span></div>
                         </div>
                     </div>
                 </div>
@@ -275,33 +315,58 @@
                     <div>
                         <h3 class="font-bold text-lg mb-2 text-gray-800 bg-green-200 px-2 py-1 rounded">Giving Directions</h3>
                         <div class="flex flex-col gap-2">
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">Go straight ahead</span><span class="vocab-pt">Segue em frente</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">Turn left / right</span><span class="vocab-pt">Vira à esq/dir</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">Take the first road on the right</span><span class="vocab-pt">Corta na 1ª à dir</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">Take the second road on the left</span><span class="vocab-pt">Corta na 2ª à esq</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">Cross the street</span><span class="vocab-pt">Atravessa a rua</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">Go along the street</span><span class="vocab-pt">Vai ao longo da rua</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">It's on the corner</span><span class="vocab-pt">Fica na esquina</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">It's on your left / right</span><span class="vocab-pt">Fica à tua esq/dir</span></div>
-                            <div class="vocab-item bg-green-50"><span class="vocab-en">Turn right at the crossroads</span><span class="vocab-pt">Vira à dir no cruzamento</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('Go straight ahead')">Go straight ahead</span><span class="vocab-pt">Segue em frente</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('Turn left / right')">Turn left / right</span><span class="vocab-pt">Vira à esq/dir</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('Take the first road on the right')">Take the first road on the right</span><span class="vocab-pt">Corta na 1ª à dir</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('Take the second road on the left')">Take the second road on the left</span><span class="vocab-pt">Corta na 2ª à esq</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('Cross the street')">Cross the street</span><span class="vocab-pt">Atravessa a rua</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('Go along the street')">Go along the street</span><span class="vocab-pt">Vai ao longo da rua</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('It\\'s on the corner')">It's on the corner</span><span class="vocab-pt">Fica na esquina</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('It\\'s on your left / right')">It's on your left / right</span><span class="vocab-pt">Fica à tua esq/dir</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en" onclick="speakText('Turn right at the crossroads')">Turn right at the crossroads</span><span class="vocab-pt">Vira à dir no cruzamento</span></div>
                         </div>
                     </div>
                     <div>
                         <h3 class="font-bold text-lg mb-2 text-gray-800 bg-blue-200 px-2 py-1 rounded">Prepositions of Place & Movement</h3>
                         <div class="flex flex-col gap-2">
-                            <div class="vocab-item"><span class="vocab-en">Next to</span><span class="vocab-pt">Ao lado de</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Between</span><span class="vocab-pt">Entre</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Opposite</span><span class="vocab-pt">No lado oposto (em frente)</span></div>
-                            <div class="vocab-item"><span class="vocab-en">In front of</span><span class="vocab-pt">Em frente a</span></div>
-                            <div class="vocab-item"><span class="vocab-en">Behind</span><span class="vocab-pt">Atrás de</span></div>
-                            <div class="vocab-item"><span class="vocab-en">In the middle of</span><span class="vocab-pt">No meio de</span></div>
-                            <div class="vocab-item"><span class="vocab-en">On / In / Under</span><span class="vocab-pt">Em cima / Dentro / Baixo</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Next to')">Next to</span><span class="vocab-pt">Ao lado de</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Between')">Between</span><span class="vocab-pt">Entre</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Opposite')">Opposite</span><span class="vocab-pt">No lado oposto (em frente)</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('In front of')">In front of</span><span class="vocab-pt">Em frente a</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Behind')">Behind</span><span class="vocab-pt">Atrás de</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('In the middle of')">In the middle of</span><span class="vocab-pt">No meio de</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('On / In / Under')">On / In / Under</span><span class="vocab-pt">Em cima / Dentro / Baixo</span></div>
                             <hr class="my-2 border-gray-400">
-                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Through</span><span class="vocab-pt">Através de</span></div>
-                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Towards</span><span class="vocab-pt">Em direção a</span></div>
-                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Across</span><span class="vocab-pt">De um lado para o outro</span></div>
-                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Along</span><span class="vocab-pt">Ao longo de</span></div>
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700" onclick="speakText('Through')">Through</span><span class="vocab-pt">Através de</span></div>
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700" onclick="speakText('Towards')">Towards</span><span class="vocab-pt">Em direção a</span></div>
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700" onclick="speakText('Across')">Across</span><span class="vocab-pt">De um lado para o outro</span></div>
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700" onclick="speakText('Along')">Along</span><span class="vocab-pt">Ao longo de</span></div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FLASH QUIZ -->
+            <div id="content-quiz" class="flex-grow p-6 overflow-y-auto hidden">
+                <h2 class="text-2xl font-bold mb-2 text-[#7b1fa2] border-b-2 border-[#7b1fa2] pb-2 w-full">⚡ Flash Quiz (Sistema Inteligente)</h2>
+                <p class="text-gray-600 text-sm mb-4">Traduz a palavra! Se errares, a carta voltará a aparecer para treinares melhor.</p>
+                <div class="flex gap-4 mb-6 flex-wrap">
+                    <button onclick="startQuiz('EN_PT')" class="btn-minecraft btn-minecraft-blue text-xs">🇬🇧 EN → PT</button>
+                    <button onclick="startQuiz('PT_EN')" class="btn-minecraft btn-minecraft-purple text-xs">🇵🇹 PT → EN</button>
+                    <div id="quiz-score" class="text-gray-700 font-bold text-sm bg-white px-4 py-2 rounded border border-gray-300 flex items-center">Escolhe um modo para começar</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div id="quiz-card" class="w-full max-w-lg rounded-2xl shadow-2xl p-10 text-center text-white cursor-pointer select-none mb-4 relative" onclick="flipQuizCard()" style="min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#7b1fa2,#311b92);">
+                        <button onclick="event.stopPropagation(); if(quizMode==='EN_PT' && !quizFlipped) speakText(quizCurrent.en); else if(quizMode==='PT_EN' && quizFlipped) speakText(quizCurrent.en);" class="absolute top-4 right-4 bg-white bg-opacity-20 hover:bg-opacity-40 rounded-full w-10 h-10 flex items-center justify-center text-2xl" id="btn-quiz-audio">🔊</button>
+                        <div id="quiz-card-icon" class="text-5xl mb-3">📚</div>
+                        <div id="quiz-card-word" class="text-3xl font-bold mb-2">Pronto para jogar?</div>
+                        <div id="quiz-card-lang" class="text-xs text-purple-200 uppercase tracking-widest mb-2">Escolhe EN→PT ou PT→EN</div>
+                        <div id="quiz-card-answer" class="hidden text-2xl mt-4 font-bold text-yellow-300 border-t border-purple-400 pt-4 w-full"></div>
+                        <div id="quiz-card-hint" class="text-xs text-purple-300 mt-3">Clica no cartão para ver a resposta</div>
+                    </div>
+                    <div id="quiz-answer-btns" class="flex gap-4 mb-4 hidden">
+                        <button onclick="quizResult(false)" class="btn-minecraft text-sm" style="background:#c62828;">✗ Errei (Repetir)</button>
+                        <button onclick="quizResult(true)" class="btn-minecraft text-sm" style="background:#2e7d32;">✓ Acertei</button>
                     </div>
                 </div>
             </div>
@@ -322,6 +387,7 @@
                     <div class="category-tab" onclick="setCategory('services', this)">Services</div>
                     <div class="category-tab" onclick="setCategory('shops', this)">Shops</div>
                     <div class="category-tab" onclick="setCategory('leisure', this)">Leisure</div>
+                    <div class="category-tab" onclick="setCategory('houses', this)">Houses</div>
                 </div>
                 <div id="tools-container" class="grid grid-cols-2 gap-2 overflow-y-auto tools-scroll flex-grow pr-2"></div>
             </div>
@@ -329,8 +395,9 @@
             <div class="flex flex-col items-center justify-center">
                 <div id="instruction-panel" class="instruction-box mb-4 hidden w-full max-w-2xl"></div>
                 <div id="grid-container"></div>
-                <div class="mt-4 flex gap-4 w-full justify-between px-2">
+                <div class="mt-4 flex gap-4 w-full justify-between px-2 items-center">
                     <button onclick="clearGrid()" class="btn-minecraft bg-red-600 text-sm border-red-400 hover:bg-red-500">Apagar Tudo</button>
+                    <button onclick="toggleCharacter()" id="btn-char-select-build" class="btn-minecraft btn-minecraft-purple text-sm">👤 Avatar: Filipe</button>
                     <button onclick="enter3D()" class="btn-minecraft btn-minecraft-green text-lg py-3 px-6 minecraft-font text-xs animate-pulse hover:bg-green-500">ENTRAR EM 3D ➔</button>
                 </div>
             </div>
@@ -341,17 +408,29 @@
     <div id="ui-3d" class="absolute inset-0 pointer-events-none hidden z-30">
         <div id="crosshair"></div>
         <div id="instruction-panel-3d" class="absolute top-10 left-1/2 transform -translate-x-1/2 instruction-box hidden pointer-events-auto w-auto px-8 max-w-4xl text-xl leading-relaxed"></div>
+        
+        <!-- Minimapa adicionado aqui -->
+        <canvas id="minimap" width="150" height="150" class="absolute top-4 right-4 border-4 border-[#555] rounded-full bg-[#7cb342] opacity-80 pointer-events-none" style="box-shadow: 0px 0px 10px rgba(0,0,0,0.8);"></canvas>
 
-        <div id="target-info-panel" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-85 border-4 border-[#555] border-t-[#aaa] border-l-[#aaa] p-4 text-center hidden min-w-[350px]">
+        <div id="target-info-panel" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-85 border-4 border-[#555] border-t-[#aaa] border-l-[#aaa] p-4 text-center hidden min-w-[500px]">
             <h3 id="target-name" class="text-2xl font-bold text-white minecraft-font mb-4">Building</h3>
-            <p id="target-desc" class="text-lg text-green-300 leading-relaxed">It is next to...</p>
+            <p id="target-desc" class="text-lg text-green-300 leading-relaxed mb-2">It is next to...</p>
+            
+            <!-- Painel Interativo de Quiz 3D -->
+            <div id="quiz-buttons" class="flex justify-center gap-2 mt-4 hidden w-full">
+                <button id="quiz-btn-1" onclick="submitQuizAnswer(0)" class="btn-minecraft text-[10px] px-2 py-2 flex-1 break-words">1. Next to</button>
+                <button id="quiz-btn-2" onclick="submitQuizAnswer(1)" class="btn-minecraft text-[10px] px-2 py-2 flex-1 break-words">2. Opposite</button>
+                <button id="quiz-btn-3" onclick="submitQuizAnswer(2)" class="btn-minecraft text-[10px] px-2 py-2 flex-1 break-words">3. Behind</button>
+            </div>
+            <p id="quiz-hint" class="text-[10px] text-gray-400 mt-3 hidden uppercase tracking-widest font-bold">Pressiona as teclas 1, 2 ou 3 para responder</p>
         </div>
 
         <div id="start-3d-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 pointer-events-auto">
             <h2 class="minecraft-font text-white text-4xl mb-6 text-center leading-relaxed text-shadow-md text-green-400">Cidade Pronta!</h2>
             <p class="text-white text-lg mb-8 bg-gray-800 p-6 border-4 border-gray-500 text-center rounded">
                 <b>W A S D</b> = Andar<br><b>Rato</b> = Olhar em redor<br><br>
-                <span class="text-yellow-400 font-bold block mt-2">Dica: Aponta a cruz do ecrã para os prédios<br>para veres as preposições a funcionar!</span>
+                <span class="text-yellow-400 font-bold block mt-2">Dica: Aponta a cruz para os prédios<br>para veres as preposições a funcionar<br>e ouvires o nome do edifício (Áudio)!</span>
+                <span class="text-green-400 font-bold block mt-4 border-t-2 border-gray-600 pt-4">⚡ NOVO: Preenche os espaços <span class="bg-black text-white px-2 py-1 mx-1 border border-white">[ ___ ]</span><br> usando as teclas 1, 2 e 3 do teclado!</span>
             </p>
             <button id="btn-lock-pointer" class="btn-minecraft btn-minecraft-green text-2xl minecraft-font px-8 py-4 animate-bounce">JOGAR</button>
             <button onclick="exit3D()" class="btn-minecraft mt-6 hover:bg-gray-500">Voltar ao Mapa</button>
@@ -366,9 +445,40 @@
     <div id="canvas-container" class="absolute inset-0 z-10 hidden"></div>
 
     <script>
-        // --- BASE DE DADOS COMPLETA (24 Edifícios com GLB Customizado para a Bakery) ---
+        // --- FUNÇÃO DE ÁUDIO (TEXT-TO-SPEECH) ---
+        function speakText(text, lang = 'en-GB') {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel(); // Parar o que estiver a tocar
+            
+            // Remover tags HTML do texto (ex: <span>)
+            const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/🔊/g, '').replace(/\[ ___ \]/g, 'blank'); 
+            
+            const utter = new SpeechSynthesisUtterance(cleanText);
+            utter.lang = lang;
+            utter.rate = 0.9; // Um bocadinho mais lento para alunos perceberem melhor
+            window.speechSynthesis.speak(utter);
+        }
+
+        // --- SISTEMA DE SELEÇÃO DE AVATAR ---
+        let currentCharacter = 'Filipe';
+        const CHARACTER_MODELS = {
+            'Filipe': 'https://profjoaoav.github.io/cidade/player.glb',
+            'Teo': 'https://profjoaoav.github.io/cidade/denim%20jacket%20man%203d%20model.glb'
+        };
+
+        function toggleCharacter() {
+            currentCharacter = currentCharacter === 'Filipe' ? 'Teo' : 'Filipe';
+            const btnMenu = document.getElementById('btn-char-select-menu');
+            const btnBuild = document.getElementById('btn-char-select-build');
+            if (btnMenu) btnMenu.innerHTML = `👤 Avatar: ${currentCharacter}`;
+            if (btnBuild) btnBuild.innerHTML = `👤 Avatar: ${currentCharacter}`;
+            showToast(`Avatar alterado para ${currentCharacter}!`, '#9c27b0');
+        }
+
+
+        // --- BASE DE DADOS COMPLETA COM REQUISITOS DE ESTRELAS ---
         const BUILDINGS = {
-            0: { id: 0, category: 'none', name: 'Grass', color: '#558b2f', icon: '', type: 'floor' },
+            0: { id: 0, category: 'basic', name: 'Apagar', color: '#ffcccc', icon: '🧽', type: 'floor' },
             1: { id: 1, category: 'basic', name: 'Road', color: '#666666', icon: '🛣️', type: 'road' },
             2: { id: 2, category: 'basic', name: 'Park', color: '#2e7d32', icon: '🌳', type: 'nature', height: 0.1 }, 
             
@@ -380,11 +490,9 @@
             8: { id: 8, category: 'services', name: 'Post Office', color: '#e53935', icon: '📮', type: 'building', height: 2.5, style: 'shop_awning' },
             9: { id: 9, category: 'services', name: 'Church', color: '#d7ccc8', icon: '⛪', type: 'building', height: 6, style: 'church' },
             10: { id: 10, category: 'services', name: 'Train Station', color: '#ff9800', icon: '🚉', type: 'building', height: 3, style: 'station' },
-            11: { id: 11, category: 'services', name: 'Airport', color: '#90a4ae', icon: '✈️', type: 'building', height: 3, style: 'modern' },
+            11: { id: 11, category: 'services', name: 'Airport', color: '#90a4ae', icon: '✈️', type: 'building', height: 3, style: 'modern', reqStars: 15 }, // BLOQUEADO
             
-            // BAKERY ALTERADA PARA USAR O MODELO 3D EXTERNO E COM ESCALA AUMENTADA
-            12: { id: 12, category: 'shops', name: 'Bakery', color: '#ffb300', icon: '🍞', type: 'model', modelUrl: 'https://profjoaoav.github.io/cidade/Bakery.glb', height: 2, style: 'shop_awning', modelScale: 2.3 },
-            
+            12: { id: 12, category: 'shops', name: 'Bakery', color: '#ffb300', icon: '🍞', type: 'building', height: 2, style: 'shop_awning' },
             13: { id: 13, category: 'shops', name: 'Supermarket', color: '#00838f', icon: '🛒', type: 'building', height: 3, style: 'shop_glass' },
             14: { id: 14, category: 'shops', name: 'Butcher\'s', color: '#e57373', icon: '🥩', type: 'building', height: 2, style: 'shop_awning' },
             15: { id: 15, category: 'shops', name: 'Chemist\'s', color: '#4caf50', icon: '💊', type: 'building', height: 2.2, style: 'shop_cross' },
@@ -395,12 +503,25 @@
             
             20: { id: 20, category: 'leisure', name: 'Cinema', color: '#311b92', icon: '🎬', type: 'building', height: 3.5, style: 'cinema' },
             21: { id: 21, category: 'leisure', name: 'Museum', color: '#eeeeee', icon: '🏛️', type: 'building', height: 4, style: 'columns' },
-            22: { id: 22, category: 'leisure', name: 'Stadium', color: '#43a047', icon: '🏟️', type: 'building', height: 3, style: 'stadium' },
+            22: { id: 22, category: 'leisure', name: 'Stadium', color: '#43a047', icon: '🏟️', type: 'building', height: 3, style: 'stadium', reqStars: 10 }, // BLOQUEADO
             23: { id: 23, category: 'leisure', name: 'Hotel', color: '#00bcd4', icon: '🏨', type: 'building', height: 7, style: 'hotel' },
             24: { id: 24, category: 'leisure', name: 'Theatre', color: '#b71c1c', icon: '🎭', type: 'building', height: 4, style: 'cinema' },
             
-            // NOVO MODELO: BAR
-            25: { id: 25, category: 'leisure', name: 'Bar', color: '#880e4f', icon: '🍹', type: 'model', modelUrl: 'https://profjoaoav.github.io/cidade/Bar.glb', height: 2, style: 'shop_awning', modelScale: 2.0 },
+            25: { id: 25, category: 'services', name: 'Café', color: '#8d6e63', icon: '☕', type: 'building', height: 2, style: 'shop_awning' },
+            26: { id: 26, category: 'services', name: 'Library', color: '#795548', icon: '📚', type: 'building', height: 3.5, style: 'brick' },
+            27: { id: 27, category: 'services', name: 'Restaurant', color: '#e64a19', icon: '🍽️', type: 'building', height: 2.5, style: 'shop_glass' },
+            28: { id: 28, category: 'leisure', name: 'Zoo', color: '#2e7d32', icon: '🦁', type: 'nature', height: 0.1, reqStars: 20 }, // BLOQUEADO
+            29: { id: 29, category: 'shops', name: 'Bookshop', color: '#5d4037', icon: '📖', type: 'building', height: 2.5, style: 'shop_awning' },
+            30: { id: 30, category: 'shops', name: 'Gift shop', color: '#d81b60', icon: '🎁', type: 'building', height: 2, style: 'shop_colorful' },
+            31: { id: 31, category: 'shops', name: 'Pet shop', color: '#00838f', icon: '🐾', type: 'building', height: 2, style: 'shop_awning' },
+            32: { id: 32, category: 'shops', name: 'Shoe shop', color: '#fbc02d', icon: '👞', type: 'building', height: 2.5, style: 'shop_glass' },
+            33: { id: 33, category: 'houses', name: 'Block of flats', color: '#b0bec5', icon: '🏢', type: 'building', height: 6, style: 'modern' },
+            34: { id: 34, category: 'houses', name: 'Caravan', color: '#eceff1', icon: '🚐', type: 'building', height: 1.2, style: 'normal' },
+            35: { id: 35, category: 'houses', name: 'Cottage', color: '#8d6e63', icon: '🏡', type: 'building', height: 1.8, style: 'brick' },
+            36: { id: 36, category: 'houses', name: 'Detached house', color: '#fff59d', icon: '🏠', type: 'building', height: 2.5, style: 'normal' },
+            37: { id: 37, category: 'houses', name: 'Semi-detached', color: '#ffcc80', icon: '🏘️', type: 'building', height: 2.5, style: 'normal' },
+            38: { id: 38, category: 'houses', name: 'Terraced house', color: '#ef9a9a', icon: '🏘️', type: 'building', height: 2.5, style: 'brick' },
+            39: { id: 39, category: 'houses', name: 'Skyscraper', color: '#90caf9', icon: '🏙️', type: 'building', height: 12, style: 'hotel', reqStars: 30 }, // BLOQUEADO
         };
 
         const GRID_SIZE = 20;
@@ -409,7 +530,6 @@
         let currentTool = 1;
         let currentMode = 'free';
         let activeCategory = 'basic';
-        let currentMissionIndex = 0;
         
         let scene, camera, renderer, controls;
         let gameBlocks = [];
@@ -419,19 +539,205 @@
         let playerMesh = null;
         let raycaster = null;
         let animationFrameId;
+        let currentMissionIndex = 0;
+        let moveMissionStartPos = null;
+
+        // --- SISTEMA DE PROGRESSO E PONTUAÇÃO ---
+        const SAVE_KEY = 'citycraft_progress_v1';
+        let missionAttempts = 0;
+        let missionStars = {};
+        let explorerStars = 0;
+
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem(SAVE_KEY);
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return { builderMission: 0, explorerMission: 0, builderStars: {}, explorerStars: 0 };
+        }
+
+        function saveProgress() {
+            try {
+                const prog = loadProgress();
+                const data = {
+                    builderMission: currentMode === 'guided_place' ? currentMissionIndex : prog.builderMission,
+                    explorerMission: currentMode === 'guided_move' ? currentMissionIndex : prog.explorerMission,
+                    builderStars: missionStars,
+                    explorerStars: explorerStars
+                };
+                localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+            } catch(e) {}
+        }
+
+        function resetProgress() {
+            if (!confirm('Tens a certeza que queres apagar todo o progresso?')) return;
+            localStorage.removeItem(SAVE_KEY);
+            missionStars = {};
+            explorerStars = 0;
+            updateMenuStars();
+            showToast('Progresso apagado!', '#e53935');
+        }
+
+        function calcStars(attempts) {
+            if (attempts <= 1) return 3;
+            if (attempts <= 3) return 2;
+            return 1;
+        }
+
+        function starsHTML(n, small = false) {
+            const sz = small ? 'text-sm' : 'text-xl';
+            return `<span class="${sz}">${'⭐'.repeat(n)}${'☆'.repeat(3 - n)}</span>`;
+        }
+
+        function showToast(msg, color = '#558b2f') {
+            let toast = document.getElementById('toast-msg');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-msg';
+                toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:6px;color:white;font-weight:bold;z-index:9999;font-size:1.1rem;text-shadow:1px 1px #000;border:3px solid rgba(255,255,255,0.3);transition:opacity 0.4s;pointer-events:none;';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = msg;
+            toast.style.backgroundColor = color;
+            toast.style.opacity = '1';
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+        }
+
+        function getTotalStars() {
+            const prog = loadProgress();
+            const builderTotalStars = Object.values(prog.builderStars || {}).reduce((a,b) => a+b, 0);
+            const expTotalStars = prog.explorerStars || 0;
+            return builderTotalStars + expTotalStars;
+        }
+
+        function updateMenuStars() {
+            const prog = loadProgress();
+            const builderDone = Object.keys(prog.builderStars || {}).length;
+            const explorerDone = prog.explorerMission || 0;
+            const builderTotalStars = Object.values(prog.builderStars || {}).reduce((a,b) => a+b, 0);
+            const explorerTotalStars = prog.explorerStars || 0;
+
+            const bEl = document.getElementById('menu-builder-progress');
+            const eEl = document.getElementById('menu-explorer-progress');
+            if (bEl) bEl.innerHTML = builderDone > 0
+                ? `<span class="text-yellow-300 text-xs">${builderDone}/30 missões concluídas · ${builderTotalStars}⭐</span>`
+                : `<span class="text-gray-400 text-xs">Não iniciado</span>`;
+            if (eEl) eEl.innerHTML = explorerDone > 0
+                ? `<span class="text-yellow-300 text-xs">${explorerDone}/30 missões concluídas · ${explorerTotalStars}⭐</span>`
+                : `<span class="text-gray-400 text-xs">Não iniciado</span>`;
+        }
 
         // --- UI E ESTUDO ---
         function openStudyRoom() { document.getElementById('study-screen').classList.remove('hidden'); }
         function closeStudyRoom() { document.getElementById('study-screen').classList.add('hidden'); }
         
         function switchStudyTab(tabName) {
-            document.getElementById('tab-places').classList.remove('active');
-            document.getElementById('tab-directions').classList.remove('active');
-            document.getElementById('content-places').classList.add('hidden');
-            document.getElementById('content-directions').classList.add('hidden');
-            
+            ['places','directions','quiz'].forEach(t => {
+                document.getElementById('tab-' + t).classList.remove('active');
+                document.getElementById('content-' + t).classList.add('hidden');
+            });
             document.getElementById('tab-' + tabName).classList.add('active');
             document.getElementById('content-' + tabName).classList.remove('hidden');
+        }
+
+        // --- FLASH QUIZ (ESPAÇADO) ---
+        const QUIZ_WORDS = [
+            {en:'Airport',pt:'Aeroporto',icon:'✈️'},{en:'Bank',pt:'Banco',icon:'💰'},{en:'Café',pt:'Café',icon:'☕'},
+            {en:'Church',pt:'Igreja',icon:'⛪'},{en:'Cinema',pt:'Cinema',icon:'🎬'},{en:'Fire station',pt:'Quartel de bombeiros',icon:'🚒'},
+            {en:'Hospital',pt:'Hospital',icon:'🏥'},{en:'Hotel',pt:'Hotel',icon:'🏨'},{en:'Library',pt:'Biblioteca',icon:'📚'},
+            {en:'Museum',pt:'Museu',icon:'🏛️'},{en:'Park',pt:'Parque',icon:'🌳'},{en:'Police station',pt:'Esquadra da polícia',icon:'🚓'},
+            {en:'Post office',pt:'Estação dos correios',icon:'📮'},{en:'Restaurant',pt:'Restaurante',icon:'🍽️'},{en:'School',pt:'Escola',icon:'🏫'},
+            {en:'Stadium',pt:'Estádio',icon:'🏟️'},{en:'Theatre',pt:'Teatro',icon:'🎭'},{en:'Train station',pt:'Estação de comboios',icon:'🚉'},
+            {en:'Zoo',pt:'Jardim zoológico',icon:'🦁'},{en:'Bakery',pt:'Padaria',icon:'🍞'},{en:'Bookshop',pt:'Livraria',icon:'📖'},
+            {en:'Butcher\'s',pt:'Talho',icon:'🥩'},{en:'Chemist\'s',pt:'Farmácia',icon:'💊'},{en:'Clothes shop',pt:'Loja de roupa',icon:'👕'},
+            {en:'Flower shop',pt:'Florista',icon:'💐'},{en:'Newsagent\'s',pt:'Quiosque',icon:'📰'},{en:'Sports shop',pt:'Loja de desporto',icon:'⚽'},
+            {en:'Supermarket',pt:'Supermercado',icon:'🛒'},{en:'Next to',pt:'Ao lado de',icon:'↔️'},{en:'Between',pt:'Entre',icon:'↕️'},
+            {en:'Opposite',pt:'No lado oposto',icon:'⬆️'},{en:'In front of',pt:'Em frente a',icon:'➡️'},{en:'Behind',pt:'Atrás de',icon:'⬅️'},
+            {en:'Turn left',pt:'Vira à esquerda',icon:'↩️'},{en:'Turn right',pt:'Vira à direita',icon:'↪️'},
+            {en:'Go straight ahead',pt:'Segue em frente',icon:'⬆️'},{en:'Cross the street',pt:'Atravessa a rua',icon:'🚶'},
+            {en:'On the corner',pt:'Na esquina',icon:'📐'},
+            {en:'Block of flats',pt:'Prédio',icon:'🏢'},{en:'Caravan',pt:'Rulote',icon:'🚐'},{en:'Cottage',pt:'Casa de campo',icon:'🏡'},
+            {en:'Detached house',pt:'Vivenda',icon:'🏠'},{en:'Semi-detached',pt:'Geminada',icon:'🏘️'},{en:'Terraced house',pt:'Banda',icon:'🏘️'},
+            {en:'Skyscraper',pt:'Arranha-céus',icon:'🏙️'},{en:'Gift shop',pt:'Loja de lembranças',icon:'🎁'},{en:'Pet shop',pt:'Loja de animais',icon:'🐾'},
+            {en:'Shoe shop',pt:'Sapataria',icon:'👞'}
+        ];
+
+        let quizDeck = [];
+        let quizCurrent = null;
+        let quizMode = 'EN_PT';
+        let quizCorrect = 0;
+        let quizTotal = 0;
+        let quizFlipped = false;
+
+        function startQuiz(mode) {
+            quizMode = mode;
+            quizCorrect = 0;
+            quizTotal = 0;
+            quizDeck = [...QUIZ_WORDS].sort(() => Math.random() - 0.5);
+            nextQuizCard();
+        }
+
+        function nextQuizCard() {
+            if (quizDeck.length === 0) {
+                quizDeck = [...QUIZ_WORDS].sort(() => Math.random() - 0.5);
+                showToast("Baralho reiniciado!", "#9c27b0");
+            }
+            quizCurrent = quizDeck.pop();
+            quizFlipped = false;
+
+            const question = quizMode === 'EN_PT' ? quizCurrent.en : quizCurrent.pt;
+            const lang = quizMode === 'EN_PT' ? 'Inglês → Português' : 'Português → Inglês';
+
+            document.getElementById('quiz-card-icon').textContent = quizCurrent.icon;
+            document.getElementById('quiz-card-word').textContent = question;
+            document.getElementById('quiz-card-lang').textContent = lang;
+            document.getElementById('quiz-card-answer').textContent = '';
+            document.getElementById('quiz-card-answer').classList.add('hidden');
+            document.getElementById('quiz-card-hint').textContent = 'Clica no cartão para ver a resposta';
+            document.getElementById('quiz-answer-btns').classList.add('hidden');
+            document.getElementById('btn-quiz-audio').classList.remove('hidden');
+            
+            updateQuizScore();
+            
+            // Falar automaticamente se a pergunta for em Inglês
+            if (quizMode === 'EN_PT') speakText(quizCurrent.en);
+        }
+
+        function flipQuizCard() {
+            if (quizFlipped || !quizCurrent) return;
+            quizFlipped = true;
+            const answer = quizMode === 'EN_PT' ? quizCurrent.pt : quizCurrent.en;
+            const answerEl = document.getElementById('quiz-card-answer');
+            answerEl.textContent = answer;
+            answerEl.classList.remove('hidden');
+            document.getElementById('quiz-card-hint').textContent = '';
+            document.getElementById('quiz-answer-btns').classList.remove('hidden');
+            
+            // Falar a resposta se estiver a traduzir para Inglês
+            if (quizMode === 'PT_EN') speakText(quizCurrent.en);
+        }
+
+        function quizResult(correct) {
+            if (correct) {
+                quizCorrect++;
+            } else {
+                // SISTEMA LEITNER ESPAÇADO: Se errar, volta a baralhar nas próximas 3 ou 4 cartas
+                const insertIdx = Math.max(0, quizDeck.length - Math.floor(Math.random() * 3) - 1);
+                quizDeck.splice(insertIdx, 0, quizCurrent);
+                showToast("Carta inserida no baralho!", "#f44336");
+            }
+            quizTotal++;
+            updateQuizScore();
+            nextQuizCard();
+        }
+
+        function updateQuizScore() {
+            const el = document.getElementById('quiz-score');
+            if (!el) return;
+            if (quizTotal === 0) { el.textContent = 'Escolhe um modo para começar'; return; }
+            const pct = Math.round((quizCorrect / quizTotal) * 100);
+            el.innerHTML = `✅ ${quizCorrect} / ${quizTotal} &nbsp;(${pct}%)`;
         }
 
         function initUI() {
@@ -463,20 +769,27 @@
             const toolsContainer = document.getElementById('tools-container');
             toolsContainer.innerHTML = '';
             
+            const tStars = getTotalStars();
+            
             Object.values(BUILDINGS).forEach(b => {
                 if (b.category === activeCategory) {
-                    const btn = document.createElement('div');
-                    btn.className = `tool-btn ${b.id === currentTool ? 'active' : ''}`;
-                    btn.onclick = () => { currentTool = b.id; renderTools(); };
+                    const isLocked = currentMode === 'free' && b.reqStars && tStars < b.reqStars;
                     
-                    const is3DModel = b.type === 'model' ? '<span class="text-[8px] bg-blue-600 text-white px-1 rounded absolute top-1 right-1">3D</span>' : '';
+                    const btn = document.createElement('div');
+                    btn.className = `tool-btn ${b.id === currentTool ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
+                    
+                    if (isLocked) {
+                        btn.onclick = () => showToast(`Bloqueado! Precisas de ${b.reqStars} ⭐ (Tens ${tStars}). Ganha mais nas missões!`, '#f44336');
+                    } else {
+                        btn.onclick = () => { currentTool = b.id; renderTools(); };
+                    }
                     
                     btn.innerHTML = `
                         <div class="relative w-full text-center">
-                            ${is3DModel}
                             <div class="text-3xl mb-1">${b.icon}</div>
                             <div class="text-[10px] font-bold text-gray-800 break-words leading-tight h-6 flex items-center justify-center">${b.name}</div>
                             <div class="w-full h-2 mt-1 border border-black" style="background-color: ${b.color}"></div>
+                            ${isLocked ? `<div class="absolute inset-0 flex items-center justify-center text-red-600 text-3xl font-bold bg-white bg-opacity-30">🔒</div>` : ''}
                         </div>
                     `;
                     toolsContainer.appendChild(btn);
@@ -511,6 +824,16 @@
 
         function clearGrid() {
             grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+            
+            // Garantir que existe sempre um espaço de "spawn" livre (estrada) no Free Build
+            if (currentMode === 'free') {
+                for (let y = 9; y <= 11; y++) {
+                    for (let x = 9; x <= 11; x++) {
+                        grid[y][x] = 1; // 1 = Road
+                    }
+                }
+            }
+            
             renderGrid();
         }
 
@@ -525,16 +848,25 @@
             document.getElementById('build-screen').classList.remove('hidden');
             const panel = document.getElementById('instruction-panel');
             
+            const prog = loadProgress();
+
             if (mode === 'free') {
                 panel.classList.add('hidden');
                 clearGrid();
+                renderTools(); // Atualizar os locks
             } else if (mode === 'guided_place') {
                 panel.classList.remove('hidden');
-                currentMissionIndex = 0;
+                missionStars = prog.builderStars || {};
+                // Retomar na missão guardada, se existir
+                const savedMission = prog.builderMission || 0;
+                currentMissionIndex = (savedMission < placeMissions.length) ? savedMission : 0;
                 loadPlaceMission();
+                renderTools();
             } else if (mode === 'guided_move') {
+                explorerStars = prog.explorerStars || 0;
+                const savedMission = prog.explorerMission || 0;
+                currentMissionIndex = (savedMission < moveMissions.length) ? savedMission : 0;
                 setupAdventureMap();
-                currentMissionIndex = 0;
                 enter3D(); 
             }
         }
@@ -551,20 +883,69 @@
         }
 
         function loadPlaceMission() {
+            missionAttempts = 0;
             const m = placeMissions[currentMissionIndex];
+            const prevStars = missionStars[currentMissionIndex];
+            const starsInfo = prevStars ? ` ${starsHTML(prevStars, true)}` : '';
+            
+            const listenBtn = `<button onclick="speakText('${m.text}')" class="ml-4 text-2xl hover:scale-125 bg-blue-600 rounded-full w-10 h-10 flex items-center justify-center border-2 border-white shadow-lg text-white">🔊</button>`;
+
             document.getElementById('instruction-panel').innerHTML = 
-                `<div class="text-sm text-yellow-400 mb-2 minecraft-font">Mission ${currentMissionIndex + 1}/${placeMissions.length}</div>` + m.text;
+                `<div class="text-sm text-yellow-400 mb-2 minecraft-font flex justify-between items-center"><span>Mission ${currentMissionIndex + 1}/${placeMissions.length}</span><div class="flex items-center">${starsInfo}</div></div>` + 
+                `<div class="flex justify-between items-center w-full"><div>${m.text}</div>${listenBtn}</div>` +
+                `<div id="mission-feedback" class="mt-2 text-sm min-h-[1.5rem] font-bold"></div>`;
+            
             m.setup();
+            saveProgress();
+            
+            // LER MISSÃO AUTOMATICAMENTE
+            speakText(m.text);
         }
 
         function checkPlaceMission() {
             if(placeMissions[currentMissionIndex].check()) {
-                document.getElementById('instruction-panel').innerHTML = `<span class="text-green-400 font-bold text-2xl minecraft-font">Goal Complete! 🟩</span>`;
+                missionAttempts++;
+                const stars = calcStars(missionAttempts);
+                // Guardar melhor pontuação (não sobrescrever com pior)
+                if (!missionStars[currentMissionIndex] || stars > missionStars[currentMissionIndex]) {
+                    missionStars[currentMissionIndex] = stars;
+                }
+                
+                speakText("Goal Complete! Excellent!");
+                
+                document.getElementById('instruction-panel').innerHTML =
+                    `<span class="text-green-400 font-bold text-2xl minecraft-font">Goal Complete! 🟩</span><br><span class="text-2xl">${starsHTML(stars)}</span>`;
+                saveProgress();
                 setTimeout(() => {
                     currentMissionIndex++;
                     if (currentMissionIndex < placeMissions.length) loadPlaceMission();
-                    else document.getElementById('instruction-panel').innerHTML = `<span class="text-yellow-400 font-bold">Missions Complete! Click <b>ENTRAR EM 3D</b>.</span>`;
-                }, 2500);
+                    else {
+                        const totalStars = Object.values(missionStars).reduce((a,b) => a+b, 0);
+                        document.getElementById('instruction-panel').innerHTML =
+                            `<span class="text-yellow-400 font-bold">🏆 Missions Complete!<br>Total: ${totalStars} / ${placeMissions.length * 3} ⭐<br><br>Clica <b>ENTRAR EM 3D</b> para explorar.</span>`;
+                        saveProgress();
+                        updateMenuStars();
+                    }
+                }, 3000);
+            } else {
+                // Feedback de erro formativo e inteligente
+                missionAttempts++;
+                const fb = document.getElementById('mission-feedback');
+                if (fb) {
+                    const missionTextLower = placeMissions[currentMissionIndex].text.toLowerCase();
+                    let customHint = '❌ Ainda não está certo. Tenta outra vez!';
+                    
+                    if (missionTextLower.includes("next to")) customHint = '💡 Dica: "Next to" significa colocar os edifícios lado-a-lado, sem espaço ou estradas no meio.';
+                    else if (missionTextLower.includes("opposite")) customHint = '💡 Dica: "Opposite" significa que eles estão virados de frente um para o outro, normalmente com uma estrada a separá-los.';
+                    else if (missionTextLower.includes("between")) customHint = '💡 Dica: "Between" significa que o edifício tem de ficar exatamente no MEIO dos outros dois.';
+                    else if (missionTextLower.includes("behind")) customHint = '💡 Dica: "Behind" significa que fica na parte de trás, escondido pelo edifício principal.';
+                    else if (missionTextLower.includes("on the corner")) customHint = '💡 Dica: "On the corner" significa que fica na quina onde duas ruas se cruzam.';
+                    
+                    fb.innerHTML = `<span style="color:#ff7043;">${customHint}</span>`;
+                    speakText("Try again!");
+                    
+                    setTimeout(() => { if(fb) fb.innerHTML = ''; }, 4500);
+                }
             }
         }
 
@@ -619,8 +1000,12 @@
                 return;
             }
             const m = moveMissions[currentMissionIndex];
-            document.getElementById('instruction-panel-3d').innerHTML = m.text;
+            const listenBtn = `<button onclick="speakText('${m.text}')" class="absolute -top-4 right-0 text-3xl bg-blue-600 rounded-full w-12 h-12 flex items-center justify-center border-2 border-white hover:scale-110 pointer-events-auto shadow-xl text-white">🔊</button>`;
+            document.getElementById('instruction-panel-3d').innerHTML = m.text + listenBtn;
             if (playerPos) moveMissionStartPos = playerPos.clone();
+            
+            // Falar Missão automaticamente
+            speakText(m.text);
         }
 
         // Utilitário para criar missões de forma limpa
@@ -655,7 +1040,7 @@
 
             // DIFÍCIL (21-30) - Mais contexto, múltiplas colocações
             { text: "<span class='level-badge lvl-hard'>Hard 21/30</span><br>Build a Shopping Street! Place a <span class='highlight-place'>Bakery</span>, a <span class='highlight-place'>Clothes Shop</span>, and a <span class='highlight-place'>Chemist's</span> side-by-side (next to each other).", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => (checkAdjacency(12, 16) && checkAdjacency(16, 15)) || (checkAdjacency(16, 12) && checkAdjacency(12, 15)) || (checkAdjacency(12, 15) && checkAdjacency(15, 16)) },
-            { text: "<span class='level-badge lvl-hard'>Hard 22/30</span><br>Build a Shopping Street! Place a <span class='highlight-place'>Bakery</span>, a <span class='highlight-place'>Clothes Shop</span>, and a <span class='highlight-place'>Chemist's</span> side-by-side.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => (checkAdjacency(12, 16) && checkAdjacency(16, 15)) || (checkAdjacency(16, 12) && checkAdjacency(12, 15)) || (checkAdjacency(12, 15) && checkAdjacency(15, 16)) },
+            { text: "<span class='level-badge lvl-hard'>Hard 22/30</span><br>Place the <span class='highlight-place'>Hospital</span>. Put the <span class='highlight-place'>Police Station</span> <span class='highlight-prep'>next to</span> it, and the <span class='highlight-place'>Fire Station</span> <span class='highlight-prep'>next to</span> the Police Station — an emergency row!", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 4; renderTools(); }, check: () => checkAdjacency(4, 5) && checkAdjacency(5, 6) },
             { text: "<span class='level-badge lvl-hard'>Hard 23/30</span><br>Place a <span class='highlight-place'>Park</span>. Put a <span class='highlight-place'>Museum</span> <span class='highlight-prep'>behind</span> it, and a <span class='highlight-place'>Cinema</span> <span class='highlight-prep'>next to</span> the Museum.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => { let p=getCoordsOf(2); return p.length>0 && grid[p[0].y-1][p[0].x]===21 && checkAdjacency(20, 21); } },
             { text: "<span class='level-badge lvl-hard'>Hard 24/30</span><br>Fill the corners! Put a <span class='highlight-place'>Bank</span> (top-left), a <span class='highlight-place'>Post Office</span> (top-right), and a <span class='highlight-place'>Police Station</span> (bottom-left).", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 7; renderTools(); }, check: () => grid[9][9]===7 && grid[9][11]===8 && grid[11][9]===5 },
             { text: "<span class='level-badge lvl-hard'>Hard 25/30</span><br>Put a <span class='highlight-place'>School</span>. Put a <span class='highlight-place'>Park</span> <span class='highlight-prep'>opposite</span> the School, and a <span class='highlight-place'>Library</span> (Museum icon) <span class='highlight-prep'>next to</span> the School.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 3; renderTools(); }, check: () => checkOpposite(2, 3, 1) && checkAdjacency(21, 3) },
@@ -706,6 +1091,8 @@
 
             // Quarteirão SW (Transportes)
             grid[15][5] = 10; // Train Station (Corner)
+            grid[15][4] = 35; // Cottage
+            grid[16][5] = 33; // Block of flats
 
             // Quarteirão S (Negócios)
             grid[15][7] = 7; // Bank (Corner)
@@ -769,35 +1156,73 @@
         }
 
         function getGrassTexture() {
-            // Relva mais suave e com maior resolução (não tão pixelizada)
-            const canvas = document.createElement('canvas');
-            canvas.width = 512; canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#558b2f';
-            ctx.fillRect(0, 0, 512, 512);
-            for(let i=0; i<20000; i++) {
-                ctx.fillStyle = Math.random() > 0.5 ? '#7cb342' : '#33691e';
-                ctx.globalAlpha = Math.random() * 0.4;
-                ctx.fillRect(Math.random()*512, Math.random()*512, 6, 6);
-            }
-            ctx.globalAlpha = 1.0;
-            const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping; 
-            tex.wrapT = THREE.RepeatWrapping;
-            tex.magFilter = THREE.LinearFilter;
-            tex.minFilter = THREE.LinearMipmapLinearFilter;
-            return tex;
+            return createMinecraftTexture(512, (ctx, s) => {
+                const baseColor = '#558b2f';
+                ctx.fillStyle = baseColor;
+                ctx.fillRect(0, 0, s, s);
+                
+                const colors = ['#33691e', '#689f38', '#4caf50', '#7cb342'];
+                const noiseSize = 4; // Tamanho muito mais fino para não ficar pixelizado
+                for(let y=0; y<s; y+=noiseSize) {
+                    for(let x=0; x<s; x+=noiseSize) {
+                        if(Math.random() > 0.4) {
+                            ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)];
+                            ctx.fillRect(x, y, noiseSize, noiseSize);
+                        }
+                    }
+                }
+                
+                // Detalhes da relva/flores mais detalhados
+                ctx.fillStyle = '#8bc34a';
+                for(let i=0; i<800; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 5, 5);
+                ctx.fillStyle = '#cddc39'; // Flores amarelas
+                for(let i=0; i<200; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+                ctx.fillStyle = '#fff59d'; // Flores brancas
+                for(let i=0; i<100; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 3, 3);
+            });
         }
 
         function getRoadTexture() {
-            return createMinecraftTexture(32, (ctx, s) => {
-                ctx.fillStyle = '#666'; ctx.fillRect(0,0,s,s);
-                ctx.fillStyle = '#999'; ctx.fillRect(0,0,s,4); ctx.fillRect(0,28,s,4);
-                ctx.fillRect(0,0,4,s); ctx.fillRect(28,0,4,s);
-                ctx.fillStyle = '#555';
-                for(let i=0; i<100; i++) ctx.fillRect(Math.floor(Math.random()*s), Math.floor(Math.random()*s), 2, 2);
-                ctx.fillStyle = 'white'; ctx.fillRect(14,4,4,8); ctx.fillRect(14,20,4,8);
-                ctx.fillRect(4,14,8,4); ctx.fillRect(20,14,8,4);
+            return createMinecraftTexture(256, (ctx, s) => {
+                ctx.fillStyle = '#555555'; 
+                ctx.fillRect(0,0,s,s);
+                
+                // Ruído do asfalto
+                ctx.fillStyle = '#4a4a4a';
+                for(let i=0; i<2000; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+                ctx.fillStyle = '#666666';
+                for(let i=0; i<2000; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+
+                // Passeios (bermas)
+                ctx.fillStyle = '#333333'; 
+                ctx.fillRect(0, 0, s, 24); 
+                ctx.fillRect(0, s-24, s, 24);
+                ctx.fillRect(0, 0, 24, s); 
+                ctx.fillRect(s-24, 0, 24, s);
+                
+                // Textura das bermas
+                ctx.fillStyle = '#222222';
+                for(let i=0; i<s; i+=32) {
+                    ctx.fillRect(i, 0, 2, 24);
+                    ctx.fillRect(i, s-24, 2, 24);
+                    ctx.fillRect(0, i, 24, 2);
+                    ctx.fillRect(s-24, i, 24, 2);
+                }
+
+                // Linha tracejada do meio
+                ctx.fillStyle = '#ffffff';
+                const dashLength = 48;
+                const gap = 32;
+                const lineWidth = 12;
+                
+                for(let i=0; i<s; i+=(dashLength+gap)) {
+                    ctx.fillRect(i, s/2 - lineWidth/2, dashLength, lineWidth); // Horizontal
+                    ctx.fillRect(s/2 - lineWidth/2, i, lineWidth, dashLength); // Vertical
+                }
+                
+                // Limpar cruzamento
+                ctx.fillStyle = '#555555';
+                ctx.fillRect(s/2 - lineWidth/2, s/2 - lineWidth/2, lineWidth, lineWidth);
             });
         }
 
@@ -913,6 +1338,7 @@
                     document.getElementById('start-3d-overlay').classList.add('hidden');
                     document.getElementById('btn-exit-3d').classList.remove('hidden');
                     document.getElementById('crosshair').style.display = 'block';
+                    document.getElementById('minimap').style.display = 'block';
                     
                     if(currentMode === 'guided_move') {
                         if(playerPos) moveMissionStartPos = playerPos.clone();
@@ -924,6 +1350,7 @@
                     if(document.getElementById('canvas-container').classList.contains('hidden')) return;
                     document.getElementById('start-3d-overlay').classList.remove('hidden');
                     document.getElementById('crosshair').style.display = 'none';
+                    document.getElementById('minimap').style.display = 'none';
                     document.getElementById('target-info-panel').classList.add('hidden');
                 });
 
@@ -931,7 +1358,15 @@
             }
 
             const onKeyDown = (e) => {
-                switch(e.code){ case 'ArrowUp': case 'KeyW': moveForward = true; break; case 'ArrowLeft': case 'KeyA': moveLeft = true; break; case 'ArrowDown': case 'KeyS': moveBackward = true; break; case 'ArrowRight': case 'KeyD': moveRight = true; break; }
+                switch(e.code){ 
+                    case 'ArrowUp': case 'KeyW': moveForward = true; break; 
+                    case 'ArrowLeft': case 'KeyA': moveLeft = true; break; 
+                    case 'ArrowDown': case 'KeyS': moveBackward = true; break; 
+                    case 'ArrowRight': case 'KeyD': moveRight = true; break; 
+                    case 'Digit1': case 'Numpad1': if(currentQuiz) submitQuizAnswer(0); break;
+                    case 'Digit2': case 'Numpad2': if(currentQuiz) submitQuizAnswer(1); break;
+                    case 'Digit3': case 'Numpad3': if(currentQuiz) submitQuizAnswer(2); break;
+                }
             };
             const onKeyUp = (e) => {
                 switch(e.code){ case 'ArrowUp': case 'KeyW': moveForward = false; break; case 'ArrowLeft': case 'KeyA': moveLeft = false; break; case 'ArrowDown': case 'KeyS': moveBackward = false; break; case 'ArrowRight': case 'KeyD': moveRight = false; break; }
@@ -960,12 +1395,40 @@
             return sprite;
         }
 
-        // --- SISTEMA DE CARREGAMENTO DO JOGADOR GLB ---
-        function createPlayerModel() {
+        function createProceduralPlayer() {
             const playerGroup = new THREE.Group();
             
-            // Fallback (Steve procedural) enquanto o GLB descarrega
-            const fallbackGroup = new THREE.Group();
+            // Carregar modelo GLB
+            const loader = new THREE.GLTFLoader();
+            loader.load(CHARACTER_MODELS[currentCharacter], function(gltf) {
+                const model = gltf.scene;
+                // Escala do jogador ainda maior face aos edifícios
+                model.scale.set(7.5, 7.5, 7.5); 
+                
+                // Forçar a atualização das matrizes para calcular a Bounding Box real
+                model.updateMatrixWorld(true);
+                const box = new THREE.Box3().setFromObject(model);
+                
+                // Elevar o modelo exatamente pela altura da sua base para que os pés fiquem em Y=0
+                model.position.y = -box.min.y; 
+                
+                model.rotation.y = Math.PI; // Virar de costas para a câmara
+                
+                model.traverse(function(node) {
+                    if (node.isMesh) {
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    }
+                });
+                
+                // Remover o boneco processual antigo e adicionar o GLB novo
+                playerGroup.clear();
+                playerGroup.add(model);
+            }, undefined, function(error) {
+                console.error(`Erro a carregar ${currentCharacter}`, error);
+            });
+
+            // Boneco processual de fallback (enquanto carrega ou caso falhe)
             const skinMat = new THREE.MeshLambertMaterial({color: 0xe0ac69}); 
             const shirtMat = new THREE.MeshLambertMaterial({color: 0x00aaff}); 
             const pantsMat = new THREE.MeshLambertMaterial({color: 0x0000aa}); 
@@ -983,44 +1446,15 @@
             const legR = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.2, 0.4), pantsMat);
             legR.position.set(0.2, 0.6, 0); legR.castShadow = true;
 
+            const fallbackGroup = new THREE.Group();
             fallbackGroup.add(head, body, armL, armR, legL, legR);
-            fallbackGroup.scale.set(1.5, 1.5, 1.5);
+            fallbackGroup.scale.set(4.5, 4.5, 4.5); // Aumentado também face à escala do jogo
+            
+            // Ajustar altura do fallback para não ficar enterrado
+            const fallbackBox = new THREE.Box3().setFromObject(fallbackGroup);
+            fallbackGroup.position.y = -fallbackBox.min.y;
+            
             playerGroup.add(fallbackGroup);
-
-            // Carregar modelo externo na internet
-            if (typeof THREE.GLTFLoader !== 'undefined') {
-                const loader = new THREE.GLTFLoader();
-                loader.load('https://profjoaoav.github.io/cidade/player.glb', (gltf) => {
-                    const model = gltf.scene;
-                    
-                    playerGroup.remove(fallbackGroup);
-                    
-                    const box = new THREE.Box3().setFromObject(model);
-                    const size = box.getSize(new THREE.Vector3());
-                    // Aumentado para 5.5 para o jogador ficar maior e mais proporcional aos prédios
-                    const targetScale = 5.5 / size.y; 
-                    
-                    model.scale.set(targetScale, targetScale, targetScale);
-                    
-                    const center = box.getCenter(new THREE.Vector3());
-                    const bottom = box.min.y;
-                    
-                    model.rotation.y = Math.PI; 
-                    
-                    model.position.set(-center.x * targetScale, -bottom * targetScale, -center.z * targetScale);
-                    
-                    model.traverse((child) => {
-                        if (child.isMesh) {
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                        }
-                    });
-
-                    playerGroup.add(model);
-                }, undefined, (error) => {
-                    console.warn("Aviso: O ficheiro player.glb não conseguiu ser descarregado. Será usado o boneco procedural de blocos.", error);
-                });
-            }
 
             return playerGroup;
         }
@@ -1060,12 +1494,14 @@
             if (!playerPos) playerPos = new THREE.Vector3(0, 0, 0);
             
             if(currentMode === 'guided_move') {
+                // Iniciar perto do Hospital (X=15, Y=6) virado para Norte
                 playerPos.set( (14 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2), 0, (17 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2) );
             } else {
-                playerPos.set(0, 0, 0); 
+                // Posicionar precisamente no meio do bloco 10,10 (garantindo que é na praça gerada)
+                playerPos.set( (10 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2), 0, (10 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2) ); 
             }
             
-            playerMesh = createPlayerModel();
+            playerMesh = createProceduralPlayer();
             if(currentMode === 'guided_move') playerMesh.rotation.y = Math.PI; 
             scene.add(playerMesh);
 
@@ -1108,81 +1544,22 @@
                         gameBlocks.push(hitMesh);
                         
                     } else {
-                        // Construção normal ou Fallback para o modelo GLB da internet
                         const height = (bData.height || 2.5) * 4; 
                         const geo = new THREE.BoxGeometry(BLOCK_SIZE, height, BLOCK_SIZE);
                         const tex = getBuildingTexture(bData);
                         const mat = new THREE.MeshStandardMaterial({ map: tex });
-                        const fallbackMesh = new THREE.Mesh(geo, mat);
-                        fallbackMesh.position.set(posX, height / 2, posZ);
-                        fallbackMesh.castShadow = true; 
-                        fallbackMesh.receiveShadow = true;
-                        scene.add(fallbackMesh);
+                        const mesh = new THREE.Mesh(geo, mat);
+                        mesh.position.set(posX, height / 2, posZ);
+                        mesh.castShadow = true; 
+                        mesh.receiveShadow = true;
+                        scene.add(mesh);
 
                         const sprite = createTextSprite(bData.name, bData.icon);
                         sprite.position.y = height + 3;
-                        fallbackMesh.add(sprite);
+                        mesh.add(sprite);
 
-                        fallbackMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon };
-                        gameBlocks.push(fallbackMesh);
-
-                        // Lógica de substituição assíncrona se for um modelo externo
-                        if (bData.type === 'model' && bData.modelUrl) {
-                            if (typeof THREE.GLTFLoader !== 'undefined') {
-                                const loader = new THREE.GLTFLoader();
-                                loader.load(bData.modelUrl, (gltf) => {
-                                    const model = gltf.scene;
-
-                                    // Removemos a caixa de fallback do cenário
-                                    scene.remove(fallbackMesh);
-                                    const index = gameBlocks.indexOf(fallbackMesh);
-                                    if (index > -1) gameBlocks.splice(index, 1);
-
-                                    // Calculamos a escala para caber exatamente na rua (limite BLOCK_SIZE)
-                                    const box = new THREE.Box3().setFromObject(model);
-                                    const size = box.getSize(new THREE.Vector3());
-                                    const maxDim = Math.max(size.x, size.z);
-                                    let targetScale = (BLOCK_SIZE * 0.9) / maxDim;
-
-                                    // Aplica a escala customizada se definida no objeto BUILDINGS (resolve o problema da Bakery pequena)
-                                    if (bData.modelScale) {
-                                        targetScale *= bData.modelScale;
-                                    }
-
-                                    model.scale.set(targetScale, targetScale, targetScale);
-
-                                    const center = box.getCenter(new THREE.Vector3());
-                                    const bottom = box.min.y;
-
-                                    model.position.set(posX - (center.x * targetScale), -bottom * targetScale, posZ - (center.z * targetScale));
-
-                                    model.traverse((child) => {
-                                        if (child.isMesh) {
-                                            child.castShadow = true;
-                                            child.receiveShadow = true;
-                                        }
-                                    });
-                                    scene.add(model);
-
-                                    // Voltamos a adicionar o nome e o ícone ao novo edifício 3D
-                                    const newSprite = createTextSprite(bData.name, bData.icon);
-                                    newSprite.position.set(posX, height + 3, posZ);
-                                    scene.add(newSprite);
-
-                                    // Criamos uma caixa de colisão invisível do tamanho do edifício
-                                    const colGeo = new THREE.BoxGeometry(BLOCK_SIZE, height, BLOCK_SIZE);
-                                    const colMat = new THREE.MeshBasicMaterial({visible: false});
-                                    const colMesh = new THREE.Mesh(colGeo, colMat);
-                                    colMesh.position.set(posX, height / 2, posZ);
-                                    colMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon };
-                                    scene.add(colMesh);
-                                    gameBlocks.push(colMesh);
-
-                                }, undefined, (error) => {
-                                    console.warn("Aviso: Falhou o download do modelo " + bData.name, error);
-                                });
-                            }
-                        }
+                        mesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon, quizSolved: false };
+                        gameBlocks.push(mesh);
                     }
                 }
             }
@@ -1226,7 +1603,7 @@
 
         // --- SISTEMAS DE NAVEGAÇÃO E RAYCASTING INTELIGENTE ---
         function checkCollisions(newPosition) {
-            const playerRadius = 1.2; 
+            const playerRadius = 2.5; // Hitbox aumentada devido ao novo tamanho do jogador
             for (let i = 0; i < gameBlocks.length; i++) {
                 if (!gameBlocks[i].userData.isSolid) continue;
                 const box = new THREE.Box3().setFromObject(gameBlocks[i]);
@@ -1237,10 +1614,9 @@
             if (Math.abs(newPosition.x) > limit || Math.abs(newPosition.z) > limit) return true;
             return false;
         }
-
-        function getLocationSentence(gridX, gridY, targetName) {
-            let sentences = [];
-            
+        
+        // Função para generar um quiz interativo baseado na localização
+        function generateQuizFor(gridX, gridY, targetName) {
             const pX = Math.floor((playerPos.x + (GRID_SIZE * BLOCK_SIZE)/2) / BLOCK_SIZE);
             const pZ = Math.floor((playerPos.z + (GRID_SIZE * BLOCK_SIZE)/2) / BLOCK_SIZE);
             
@@ -1271,34 +1647,89 @@
             if (neighbors.W > 1) adjacents.push({id: neighbors.W, dir: 'W'});
             
             let adjNames = [...new Set(adjacents.map(a => BUILDINGS[a.id].name))];
-
-            if (adjNames.length >= 2) sentences.push(`It is <span class="highlight-prep">between</span> the ${adjNames[0]} and the ${adjNames[1]}.`);
-            else if (adjNames.length === 1) sentences.push(`It is <span class="highlight-prep">next to</span> the ${adjNames[0]}.`);
-            
-            if (opposites.length > 0) sentences.push(`It is <span class="highlight-prep">opposite</span> the ${opposites[0]}.`);
-            
-            // Verificar Corner
             let isCorner = (neighbors.N===1||neighbors.S===1) && (neighbors.E===1||neighbors.W===1);
-            if(isCorner) sentences.push(`It's <span class="highlight-prep">on the corner</span>.`);
 
-            // In front of / Behind
-            if (Math.abs(dx) > Math.abs(dz)) {
-                const dirX = Math.sign(dx);
-                const behindX = gridX + dirX; 
-                if (behindX >= 0 && behindX < GRID_SIZE && grid[gridY][behindX] > 1) {
-                    sentences.push(`The ${BUILDINGS[grid[gridY][behindX]].name} is <span class="highlight-prep">behind</span> it.`);
-                }
+            let correctPrep = "";
+            let endText = "";
+
+            if (adjNames.length >= 2) {
+                correctPrep = "between";
+                endText = `the ${adjNames[0]} and the ${adjNames[1]}.`;
+            } else if (adjNames.length === 1) {
+                correctPrep = "next to";
+                endText = `the ${adjNames[0]}.`;
+            } else if (opposites.length > 0) {
+                correctPrep = "opposite";
+                endText = `the ${opposites[0]}.`;
+            } else if (isCorner) {
+                correctPrep = "on the corner";
+                endText = ``;
             } else {
-                const dirZ = Math.sign(dz);
-                const behindZ = gridY + dirZ; 
-                if (behindZ >= 0 && behindZ < GRID_SIZE && grid[behindZ][gridX] > 1) {
-                    sentences.push(`The ${BUILDINGS[grid[behindZ][gridX]].name} is <span class="highlight-prep">behind</span> it.`);
+                // Verificar se está Behind / In Front of
+                if (Math.abs(dx) > Math.abs(dz)) {
+                    const dirX = Math.sign(dx);
+                    const behindX = gridX + dirX; 
+                    if (behindX >= 0 && behindX < GRID_SIZE && grid[gridY][behindX] > 1) {
+                        correctPrep = "in front of";
+                        endText = `the ${BUILDINGS[grid[gridY][behindX]].name}.`;
+                    }
+                } else {
+                    const dirZ = Math.sign(dz);
+                    const behindZ = gridY + dirZ; 
+                    if (behindZ >= 0 && behindZ < GRID_SIZE && grid[behindZ][gridX] > 1) {
+                        correctPrep = "in front of";
+                        endText = `the ${BUILDINGS[grid[behindZ][gridX]].name}.`;
+                    }
                 }
             }
 
-            if (sentences.length === 0) return "It is isolated.";
-            return sentences.slice(0, 2).join('<br>');
+            if (!correctPrep) return null; // Isolado, sem quiz possível.
+
+            const allPreps = ["next to", "opposite", "behind", "in front of", "between", "on the corner"];
+            let options = [correctPrep];
+            while(options.length < 3) {
+                let rand = allPreps[Math.floor(Math.random() * allPreps.length)];
+                if (!options.includes(rand)) options.push(rand);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            let sentenceTemplate = endText ? `It is <span class="text-yellow-400 font-bold bg-black px-2 py-1 rounded border border-yellow-400 inline-block min-w-[80px] text-center">[ ___ ]</span> ${endText}` : `It is <span class="text-yellow-400 font-bold bg-black px-2 py-1 rounded border border-yellow-400 inline-block min-w-[80px] text-center">[ ___ ]</span>.`;
+
+            return { sentenceTemplate, correctPrep, options, endText };
         }
+
+        // --- SISTEMA DE RESPOSTAS 3D QUIZ ---
+        let currentLookedObject = null;
+        let currentQuiz = null;
+
+        window.submitQuizAnswer = function(index) {
+            if (!currentQuiz || !currentLookedObject) return;
+            const chosen = currentQuiz.options[index];
+            if (chosen === currentQuiz.correctPrep) {
+                speakText("Correct!");
+                showToast("Correto! +1 ⭐", "#2e7d32");
+                explorerStars++;
+                saveProgress();
+                updateMenuStars();
+                
+                // Marcar este objecto como resolvido para não voltar a perguntar
+                currentLookedObject.userData.quizSolved = true;
+                
+                // Mostrar a frase completa e esconder os botões
+                document.getElementById('target-desc').innerHTML = currentQuiz.sentenceTemplate.replace('[ ___ ]', `<span class="text-green-400 bg-transparent border-0 px-0 inline">${currentQuiz.correctPrep}</span>`);
+                document.getElementById('quiz-buttons').classList.add('hidden');
+                document.getElementById('quiz-hint').classList.add('hidden');
+                currentQuiz = null;
+            } else {
+                speakText("Try again.");
+                const btn = document.getElementById(`quiz-btn-${index+1}`);
+                btn.classList.add('bg-red-600');
+                btn.classList.remove('bg-[#3b3b3b]');
+                setTimeout(() => {
+                    btn.classList.remove('bg-red-600');
+                }, 1000);
+            }
+        };
 
         function performRaycasting() {
             if(!raycaster || !camera) return;
@@ -1306,22 +1737,62 @@
             const intersects = raycaster.intersectObjects(gameBlocks);
             
             const panel = document.getElementById('target-info-panel');
+            const btnContainer = document.getElementById('quiz-buttons');
+            const hint = document.getElementById('quiz-hint');
             
             if (intersects.length > 0 && intersects[0].distance < 60) { 
                 const object = intersects[0].object;
                 if (object.userData.name) { 
-                    const name = object.userData.name;
-                    const icon = object.userData.icon;
-                    const x = object.userData.x;
-                    const y = object.userData.y;
-                    
-                    document.getElementById('target-name').innerText = `${icon} You are looking at the ${name}`;
-                    document.getElementById('target-desc').innerHTML = getLocationSentence(x, y, name);
+                    if (currentLookedObject !== object) {
+                        currentLookedObject = object;
+                        const name = object.userData.name;
+                        const icon = object.userData.icon;
+                        const x = object.userData.x;
+                        const y = object.userData.y;
+                        
+                        document.getElementById('target-name').innerText = `${icon} You are looking at the ${name}`;
+                        
+                        // Preparar o Quiz se ainda não foi resolvido
+                        if (!object.userData.quizSolved) {
+                            currentQuiz = generateQuizFor(x, y, name);
+                        } else {
+                            currentQuiz = null;
+                        }
+
+                        // Mostrar o modo correto (Quiz ou Frase Normal)
+                        if (currentQuiz) {
+                            document.getElementById('target-desc').innerHTML = currentQuiz.sentenceTemplate;
+                            document.getElementById('quiz-btn-1').innerText = `1. ${currentQuiz.options[0]}`;
+                            document.getElementById('quiz-btn-2').innerText = `2. ${currentQuiz.options[1]}`;
+                            document.getElementById('quiz-btn-3').innerText = `3. ${currentQuiz.options[2]}`;
+                            
+                            btnContainer.classList.remove('hidden');
+                            hint.classList.remove('hidden');
+                            
+                            speakText(`Where is the ${name}?`);
+                        } else {
+                            // Usamos uma versão simples do generate para mostrar a frase final caso resolvido ou se for "isolated"
+                            let tempQuiz = generateQuizFor(x, y, name);
+                            if (tempQuiz) {
+                                document.getElementById('target-desc').innerHTML = tempQuiz.sentenceTemplate.replace('[ ___ ]', `<span class="text-green-400 bg-transparent border-0 px-0 inline">${tempQuiz.correctPrep}</span>`);
+                            } else {
+                                document.getElementById('target-desc').innerHTML = "It is isolated.";
+                            }
+                            btnContainer.classList.add('hidden');
+                            hint.classList.add('hidden');
+                            speakText(name);
+                        }
+                    }
                     panel.classList.remove('hidden');
                     return;
                 }
             }
-            panel.classList.add('hidden');
+            
+            if (currentLookedObject !== null) {
+                panel.classList.add('hidden');
+                currentLookedObject = null;
+                currentQuiz = null;
+            }
         }
 
         function getDistanceToNearest(targetId) {
@@ -1357,22 +1828,71 @@
             const inObj = getGridPosFromWorld(playerPos);
 
             if (m.check(dist, inObj, playerPos, moveMissionStartPos)) {
-                document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font text-xl">EXCELLENT!</span>`;
+                explorerStars++;
+                saveProgress();
+                speakText("Excellent!");
+                document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font text-xl">EXCELLENT! ⭐ (${explorerStars} estrelas)</span>`;
                 currentMissionIndex++;
                 
                 if (currentMissionIndex >= moveMissions.length) {
                     setTimeout(() => {
-                        document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font">ALL 30 MISSIONS COMPLETE! YOU ARE A MASTER!</span>`;
+                        document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font">ALL 30 MISSIONS COMPLETE! 🏆 ${explorerStars} ⭐</span>`;
+                        updateMenuStars();
                         setTimeout(exit3D, 5000);
                     }, 2000);
                 } else {
                     setTimeout(() => {
                         const nextM = moveMissions[currentMissionIndex];
-                        document.getElementById('instruction-panel-3d').innerHTML = nextM.text;
+                        const listenBtn = `<button onclick="speakText('${nextM.text}')" class="absolute -top-4 right-0 text-3xl bg-blue-600 rounded-full w-12 h-12 flex items-center justify-center border-2 border-white hover:scale-110 pointer-events-auto shadow-xl text-white">🔊</button>`;
+                        document.getElementById('instruction-panel-3d').innerHTML = nextM.text + listenBtn;
+                        speakText(nextM.text);
                         if (playerPos) moveMissionStartPos = playerPos.clone();
-                    }, 2500);
+                    }, 3500);
                 }
             }
+        }
+
+        // --- SISTEMA DE MINIMAPA ---
+        function updateMinimap() {
+            const canvas = document.getElementById('minimap');
+            if(!canvas || !playerPos || !playerMesh) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.clearRect(0, 0, w, h);
+            const cellSize = w / GRID_SIZE;
+
+            // Desenhar Edifícios
+            for(let y=0; y<GRID_SIZE; y++){
+                for(let x=0; x<GRID_SIZE; x++){
+                    const id = grid[y][x];
+                    if(id > 0) {
+                        ctx.fillStyle = BUILDINGS[id].color;
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+
+            // Desenhar Jogador
+            const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+            const px = (playerPos.x + offset) / BLOCK_SIZE;
+            const py = (playerPos.z + offset) / BLOCK_SIZE;
+
+            ctx.save();
+            ctx.translate(px * cellSize, py * cellSize);
+            // Aplicar a rotação do jogador (ajustada para o canvas 2D)
+            ctx.rotate(-playerMesh.rotation.y + Math.PI);
+            
+            // Seta vermelha indicando a posição e a direção
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.moveTo(0, -6);
+            ctx.lineTo(4, 4);
+            ctx.lineTo(-4, 4);
+            ctx.fill();
+            
+            ctx.restore();
         }
 
         function animate() {
@@ -1405,7 +1925,7 @@
                     
                     playerMesh.position.y = Math.sin(time * 0.015) * 0.3; 
                 } else {
-                    if (playerMesh) playerMesh.position.y = 0;
+                    playerMesh.position.y = 0;
                 }
 
                 const speed = 30.0; 
@@ -1427,8 +1947,9 @@
                     playerMesh.position.z = playerPos.z;
                 }
 
-                const pivotOffset = new THREE.Vector3(0, 6, 0); 
-                const cameraOffset = new THREE.Vector3(0, 2, 16); 
+                // Ajustar a câmara para suportar um jogador muito maior (olhando por cima e ligeiramente atrás)
+                const pivotOffset = new THREE.Vector3(0, 14, 0); 
+                const cameraOffset = new THREE.Vector3(0, 5, 30); 
                 
                 cameraOffset.applyQuaternion(camera.quaternion);
                 camera.position.copy(playerPos).add(pivotOffset).add(cameraOffset);
@@ -1436,6 +1957,7 @@
 
                 performRaycasting();
                 checkMoveMissions();
+                updateMinimap();
             }
             prevTime = time;
             if(renderer && scene && camera) renderer.render(scene, camera);
@@ -1443,6 +1965,7 @@
         
         window.onload = function() {
             initUI();
+            updateMenuStars();
         };
     </script>
 </body>
