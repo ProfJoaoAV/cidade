@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Builder: English Prepositions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js Base -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #87CEEB; 
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .minecraft-font { font-family: 'Press Start 2P', cursive; }
+
+        .btn-minecraft {
+            background-color: #7d7d7d;
+            border: 4px solid #3b3b3b;
+            border-top-color: #b4b4b4;
+            border-left-color: #b4b4b4;
+            color: white;
+            text-shadow: 2px 2px #3b3b3b;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn-minecraft:active {
+            border: 4px solid #b4b4b4;
+            border-top-color: #3b3b3b;
+            border-left-color: #3b3b3b;
+            transform: scale(0.98);
+        }
+
+        .btn-minecraft-green { background-color: #558b2f; }
+        .btn-minecraft-blue { background-color: #2196F3; }
+        .btn-minecraft-orange { background-color: #FF9800; }
+        .btn-minecraft-purple { background-color: #9c27b0; }
+
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            width: 75vmin;
+            height: 75vmin;
+            background-color: #7cb342;
+            border: 4px solid #33691e;
+            box-shadow: 10px 10px rgba(0,0,0,0.5);
+            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.05) 75%, rgba(0,0,0,0.05)), repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 25%, #7cb342 25%, #7cb342 75%, rgba(0,0,0,0.05) 75%, rgba(0,0,0,0.05));
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+        }
+
+        .grid-cell {
+            border: 1px solid rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8vmin;
+            text-shadow: 1px 1px 0 #fff;
+        }
+        .grid-cell:hover { background-color: rgba(255,255,255,0.5) !important; }
+
+        .category-tab {
+            padding: 8px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: bold;
+            color: #ddd;
+        }
+        .category-tab.active { color: white; border-bottom-color: #FFEB3B; }
+
+        .tool-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border: 2px solid #555;
+            cursor: pointer;
+            background-color: #c6c6c6;
+            border-top-color: #fff;
+            border-left-color: #fff;
+        }
+        .tool-btn:hover { background-color: #dfdfdf; }
+        .tool-btn.active {
+            background-color: #FFF9C4;
+            border: 2px solid #3b3b3b;
+            border-top-color: #555;
+            border-left-color: #555;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .instruction-box {
+            background-color: rgba(0, 0, 0, 0.85);
+            color: #FFF;
+            border: 4px solid #555;
+            border-top-color: #aaa;
+            border-left-color: #aaa;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            text-shadow: 2px 2px #000;
+        }
+
+        .highlight-prep { color: #55FF55; font-weight: bold; text-decoration: underline; }
+        .highlight-place { color: #55FFFF; font-weight: bold; }
+        
+        .tools-scroll::-webkit-scrollbar { width: 8px; }
+        .tools-scroll::-webkit-scrollbar-track { background: #3b3b3b; }
+        .tools-scroll::-webkit-scrollbar-thumb { background: #7d7d7d; border: 1px solid #3b3b3b; }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+            opacity: 0.8;
+        }
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background: white;
+            box-shadow: 1px 1px 0px black;
+        }
+        #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
+        #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
+
+        /* Estilos do Livro de Estudo */
+        .study-book {
+            background-color: #fdf6e3;
+            color: #3e2723;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            border: 8px solid #8d6e63;
+        }
+        .study-tab-btn {
+            background-color: #d7ccc8;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .study-tab-btn.active {
+            background-color: #fdf6e3;
+            border-bottom: 2px solid #fdf6e3;
+            font-weight: bold;
+        }
+        .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+        .vocab-item { background: #fff; padding: 8px; border: 1px solid #d7ccc8; border-radius: 4px; display: flex; justify-content: space-between; }
+        .vocab-en { font-weight: bold; color: #1565c0; }
+        .vocab-pt { color: #555; font-size: 0.9em; }
+
+        /* Estilo para Níveis */
+        .level-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-bottom: 8px;
+            border: 2px solid #fff;
+        }
+        .lvl-easy { background-color: #4CAF50; }
+        .lvl-medium { background-color: #FF9800; }
+        .lvl-hard { background-color: #f44336; }
+
+    </style>
+</head>
+<body class="w-full h-screen relative">
+
+    <!-- Ecrã Inicial (Main Menu) -->
+    <div id="main-menu" class="absolute inset-0 flex flex-col items-center justify-center bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-[#87CEEB] z-50">
+        <h1 class="minecraft-font text-5xl text-white text-center mb-4 text-shadow-md" style="text-shadow: 4px 4px #000;">
+            CITY CRAFT
+        </h1>
+        <p class="text-xl font-bold mb-10 text-white bg-black bg-opacity-70 p-4 border-2 border-gray-400 text-center">
+            Learn Places in a Town & Prepositions!<br>
+            <span class="text-sm font-normal text-yellow-300">Edition 6th Grade - 60 Missions!</span>
+        </p>
+        
+        <div class="flex flex-col gap-4 w-80">
+            <button onclick="openStudyRoom()" class="btn-minecraft btn-minecraft-purple minecraft-font text-sm hover:scale-105">📚 Study Room</button>
+            <button onclick="startGame('free')" class="btn-minecraft minecraft-font text-sm hover:scale-105">1. Free Build</button>
+            <button onclick="startGame('guided_place')" class="btn-minecraft btn-minecraft-blue minecraft-font text-sm hover:scale-105">2. Mission: Builder</button>
+            <button onclick="startGame('guided_move')" class="btn-minecraft btn-minecraft-orange minecraft-font text-sm hover:scale-105">3. Mission: Explorer</button>
+        </div>
+    </div>
+
+    <!-- Ecrã de Estudo (Study Room) -->
+    <div id="study-screen" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-80 hidden z-50 p-8">
+        <div class="study-book w-full max-w-5xl h-full max-h-[90vh] flex flex-col relative">
+            <button onclick="closeStudyRoom()" class="absolute -top-4 -right-4 bg-red-600 text-white border-4 border-red-800 rounded-full w-12 h-12 font-bold text-xl hover:bg-red-500 shadow-lg">X</button>
+            
+            <div class="flex text-lg bg-[#d7ccc8] rounded-t-lg pt-2 px-2 gap-2">
+                <button onclick="switchStudyTab('places')" id="tab-places" class="study-tab-btn active px-6 py-2 rounded-t-lg">City Places & Shops</button>
+                <button onclick="switchStudyTab('directions')" id="tab-directions" class="study-tab-btn px-6 py-2 rounded-t-lg">Directions & Prepositions</button>
+            </div>
+
+            <div id="content-places" class="flex-grow p-6 overflow-y-auto">
+                <h2 class="text-2xl font-bold mb-4 text-[#c62828] border-b-2 border-[#c62828] pb-2">City Places & Shops</h2>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">Public Places & Services</h3>
+                        <div class="vocab-grid">
+                            <div class="vocab-item"><span class="vocab-en">Airport</span><span class="vocab-pt">Aeroporto</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Bank</span><span class="vocab-pt">Banco</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Café</span><span class="vocab-pt">Café</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Church</span><span class="vocab-pt">Igreja</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Cinema</span><span class="vocab-pt">Cinema</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Fire station</span><span class="vocab-pt">Quartel de bombeiros</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Hospital</span><span class="vocab-pt">Hospital</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Hotel</span><span class="vocab-pt">Hotel</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Library</span><span class="vocab-pt">Biblioteca</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Museum</span><span class="vocab-pt">Museu</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Park</span><span class="vocab-pt">Parque</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Police station</span><span class="vocab-pt">Esquadra da polícia</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Post office</span><span class="vocab-pt">Estação dos correios</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Restaurant</span><span class="vocab-pt">Restaurante</span></div>
+                            <div class="vocab-item"><span class="vocab-en">School</span><span class="vocab-pt">Escola</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Stadium</span><span class="vocab-pt">Estádio</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Theatre</span><span class="vocab-pt">Teatro</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Train station</span><span class="vocab-pt">Estação de comboios</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Zoo</span><span class="vocab-pt">Jardim zoológico</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Bar</span><span class="vocab-pt">Bar</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">Shops (Lojas)</h3>
+                        <div class="vocab-grid mb-6">
+                            <div class="vocab-item"><span class="vocab-en">Bakery</span><span class="vocab-pt">Padaria</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Bookshop</span><span class="vocab-pt">Livraria</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Butcher's</span><span class="vocab-pt">Talho</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Chemist's</span><span class="vocab-pt">Farmácia</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Clothes shop</span><span class="vocab-pt">Loja de roupa</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Flower shop</span><span class="vocab-pt">Florista</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Gift shop</span><span class="vocab-pt">Loja de lembranças</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Newsagent's</span><span class="vocab-pt">Quiosque</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Pet shop</span><span class="vocab-pt">Loja de animais</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Shoe shop</span><span class="vocab-pt">Sapataria</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Sports shop</span><span class="vocab-pt">Loja de desporto</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Supermarket</span><span class="vocab-pt">Supermercado</span></div>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">Types of Houses</h3>
+                        <div class="vocab-grid">
+                            <div class="vocab-item"><span class="vocab-en">Block of flats</span><span class="vocab-pt">Prédio</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Caravan</span><span class="vocab-pt">Rulote</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Cottage</span><span class="vocab-pt">Casa de campo</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Detached house</span><span class="vocab-pt">Vivenda</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Semi-detached</span><span class="vocab-pt">Geminada</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Terraced house</span><span class="vocab-pt">Banda</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Skyscraper</span><span class="vocab-pt">Arranha-céus</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-directions" class="flex-grow p-6 overflow-y-auto hidden">
+                <h2 class="text-2xl font-bold mb-4 text-[#1565c0] border-b-2 border-[#1565c0] pb-2">Giving Directions & Prepositions</h2>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-lg mb-2 text-gray-800 bg-green-200 px-2 py-1 rounded">Giving Directions</h3>
+                        <div class="flex flex-col gap-2">
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">Go straight ahead</span><span class="vocab-pt">Segue em frente</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">Turn left / right</span><span class="vocab-pt">Vira à esq/dir</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">Take the first road on the right</span><span class="vocab-pt">Corta na 1ª à dir</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">Take the second road on the left</span><span class="vocab-pt">Corta na 2ª à esq</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">Cross the street</span><span class="vocab-pt">Atravessa a rua</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">Go along the street</span><span class="vocab-pt">Vai ao longo da rua</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">It's on the corner</span><span class="vocab-pt">Fica na esquina</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">It's on your left / right</span><span class="vocab-pt">Fica à tua esq/dir</span></div>
+                            <div class="vocab-item bg-green-50"><span class="vocab-en">Turn right at the crossroads</span><span class="vocab-pt">Vira à dir no cruzamento</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-2 text-gray-800 bg-blue-200 px-2 py-1 rounded">Prepositions of Place & Movement</h3>
+                        <div class="flex flex-col gap-2">
+                            <div class="vocab-item"><span class="vocab-en">Next to</span><span class="vocab-pt">Ao lado de</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Between</span><span class="vocab-pt">Entre</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Opposite</span><span class="vocab-pt">No lado oposto (em frente)</span></div>
+                            <div class="vocab-item"><span class="vocab-en">In front of</span><span class="vocab-pt">Em frente a</span></div>
+                            <div class="vocab-item"><span class="vocab-en">Behind</span><span class="vocab-pt">Atrás de</span></div>
+                            <div class="vocab-item"><span class="vocab-en">In the middle of</span><span class="vocab-pt">No meio de</span></div>
+                            <div class="vocab-item"><span class="vocab-en">On / In / Under</span><span class="vocab-pt">Em cima / Dentro / Baixo</span></div>
+                            <hr class="my-2 border-gray-400">
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Through</span><span class="vocab-pt">Através de</span></div>
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Towards</span><span class="vocab-pt">Em direção a</span></div>
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Across</span><span class="vocab-pt">De um lado para o outro</span></div>
+                            <div class="vocab-item bg-blue-50 border-blue-200"><span class="vocab-en font-bold text-blue-700">Along</span><span class="vocab-pt">Ao longo de</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ecrã de Construção 2D -->
+    <div id="build-screen" class="absolute inset-0 flex items-center justify-center bg-[#87CEEB] hidden z-40 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        <div class="absolute top-4 left-4">
+            <button onclick="showMenu()" class="btn-minecraft text-sm">⬅ Voltar</button>
+        </div>
+
+        <div class="flex gap-8 w-full max-w-7xl p-4 items-start justify-center h-full pt-16">
+            <div class="flex flex-col gap-2 bg-[#3b3b3b] p-4 border-4 border-[#555] border-t-[#aaa] border-l-[#aaa] w-[22rem] h-[80vmin] flex-shrink-0">
+                <h2 class="minecraft-font text-white text-xs text-center mb-2">City Places</h2>
+                <div class="flex text-[10px] mb-2 border-b border-gray-600 overflow-x-auto pb-1 justify-between">
+                    <div class="category-tab active" onclick="setCategory('basic', this)">Basic</div>
+                    <div class="category-tab" onclick="setCategory('services', this)">Services</div>
+                    <div class="category-tab" onclick="setCategory('shops', this)">Shops</div>
+                    <div class="category-tab" onclick="setCategory('leisure', this)">Leisure</div>
+                </div>
+                <div id="tools-container" class="grid grid-cols-2 gap-2 overflow-y-auto tools-scroll flex-grow pr-2"></div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center">
+                <div id="instruction-panel" class="instruction-box mb-4 hidden w-full max-w-2xl"></div>
+                <div id="grid-container"></div>
+                <div class="mt-4 flex gap-4 w-full justify-between px-2">
+                    <button onclick="clearGrid()" class="btn-minecraft bg-red-600 text-sm border-red-400 hover:bg-red-500">Apagar Tudo</button>
+                    <button onclick="enter3D()" class="btn-minecraft btn-minecraft-green text-lg py-3 px-6 minecraft-font text-xs animate-pulse hover:bg-green-500">ENTRAR EM 3D ➔</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface 3D -->
+    <div id="ui-3d" class="absolute inset-0 pointer-events-none hidden z-30">
+        <div id="crosshair"></div>
+        <div id="instruction-panel-3d" class="absolute top-10 left-1/2 transform -translate-x-1/2 instruction-box hidden pointer-events-auto w-auto px-8 max-w-4xl text-xl leading-relaxed"></div>
+
+        <div id="target-info-panel" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-85 border-4 border-[#555] border-t-[#aaa] border-l-[#aaa] p-4 text-center hidden min-w-[350px]">
+            <h3 id="target-name" class="text-2xl font-bold text-white minecraft-font mb-4">Building</h3>
+            <p id="target-desc" class="text-lg text-green-300 leading-relaxed">It is next to...</p>
+        </div>
+
+        <div id="start-3d-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 pointer-events-auto">
+            <h2 class="minecraft-font text-white text-4xl mb-6 text-center leading-relaxed text-shadow-md text-green-400">Cidade Pronta!</h2>
+            <p class="text-white text-lg mb-8 bg-gray-800 p-6 border-4 border-gray-500 text-center rounded">
+                <b>W A S D</b> = Andar<br><b>Rato</b> = Olhar em redor<br><br>
+                <span class="text-yellow-400 font-bold block mt-2">Dica: Aponta a cruz do ecrã para os prédios<br>para veres as preposições a funcionar!</span>
+            </p>
+            <button id="btn-lock-pointer" class="btn-minecraft btn-minecraft-green text-2xl minecraft-font px-8 py-4 animate-bounce">JOGAR</button>
+            <button onclick="exit3D()" class="btn-minecraft mt-6 hover:bg-gray-500">Voltar ao Mapa</button>
+        </div>
+        
+        <div class="absolute top-4 left-4 pointer-events-auto flex flex-col gap-2">
+            <p class="text-white text-xs bg-black bg-opacity-70 p-2 border border-gray-500 font-bold">Pressiona [ESC] para sair do modo rato</p>
+            <button onclick="exit3D()" class="btn-minecraft bg-red-600 border-red-800 hidden hover:bg-red-500 text-xs" id="btn-exit-3d">Sair da Cidade</button>
+        </div>
+    </div>
+
+    <div id="canvas-container" class="absolute inset-0 z-10 hidden"></div>
+
+    <script>
+        // --- BASE DE DADOS COMPLETA (24 Edifícios com GLB Customizado para a Bakery) ---
+        const BUILDINGS = {
+            0: { id: 0, category: 'none', name: 'Grass', color: '#558b2f', icon: '', type: 'floor' },
+            1: { id: 1, category: 'basic', name: 'Road', color: '#666666', icon: '🛣️', type: 'road' },
+            2: { id: 2, category: 'basic', name: 'Park', color: '#2e7d32', icon: '🌳', type: 'nature', height: 0.1 }, 
+            
+            3: { id: 3, category: 'services', name: 'School', color: '#c62828', icon: '🏫', type: 'building', height: 3.5, style: 'brick' },
+            4: { id: 4, category: 'services', name: 'Hospital', color: '#ffffff', icon: '🏥', type: 'building', height: 5, style: 'hospital' },
+            5: { id: 5, category: 'services', name: 'Police Station', color: '#1565c0', icon: '🚓', type: 'building', height: 3, style: 'modern' },
+            6: { id: 6, category: 'services', name: 'Fire Station', color: '#d32f2f', icon: '🚒', type: 'building', height: 3.2, style: 'brick_big_door' },
+            7: { id: 7, category: 'services', name: 'Bank', color: '#eceff1', icon: '💰', type: 'building', height: 4, style: 'columns' },
+            8: { id: 8, category: 'services', name: 'Post Office', color: '#e53935', icon: '📮', type: 'building', height: 2.5, style: 'shop_awning' },
+            9: { id: 9, category: 'services', name: 'Church', color: '#d7ccc8', icon: '⛪', type: 'building', height: 6, style: 'church' },
+            10: { id: 10, category: 'services', name: 'Train Station', color: '#ff9800', icon: '🚉', type: 'building', height: 3, style: 'station' },
+            11: { id: 11, category: 'services', name: 'Airport', color: '#90a4ae', icon: '✈️', type: 'building', height: 3, style: 'modern' },
+            
+            // BAKERY ALTERADA PARA USAR O MODELO 3D EXTERNO E COM ESCALA AUMENTADA
+            12: { id: 12, category: 'shops', name: 'Bakery', color: '#ffb300', icon: '🍞', type: 'model', modelUrl: 'https://profjoaoav.github.io/cidade/Bakery.glb', height: 2, style: 'shop_awning', modelScale: 2.3 },
+            
+            13: { id: 13, category: 'shops', name: 'Supermarket', color: '#00838f', icon: '🛒', type: 'building', height: 3, style: 'shop_glass' },
+            14: { id: 14, category: 'shops', name: 'Butcher\'s', color: '#e57373', icon: '🥩', type: 'building', height: 2, style: 'shop_awning' },
+            15: { id: 15, category: 'shops', name: 'Chemist\'s', color: '#4caf50', icon: '💊', type: 'building', height: 2.2, style: 'shop_cross' },
+            16: { id: 16, category: 'shops', name: 'Clothes Shop', color: '#9c27b0', icon: '👕', type: 'building', height: 2.5, style: 'shop_colorful' },
+            17: { id: 17, category: 'shops', name: 'Flower Shop', color: '#f48fb1', icon: '💐', type: 'building', height: 2, style: 'shop_colorful' },
+            18: { id: 18, category: 'shops', name: 'Newsagent\'s', color: '#1976d2', icon: '📰', type: 'building', height: 2, style: 'shop_awning' },
+            19: { id: 19, category: 'shops', name: 'Sports Shop', color: '#ff5722', icon: '⚽', type: 'building', height: 2.5, style: 'shop_glass' },
+            
+            20: { id: 20, category: 'leisure', name: 'Cinema', color: '#311b92', icon: '🎬', type: 'building', height: 3.5, style: 'cinema' },
+            21: { id: 21, category: 'leisure', name: 'Museum', color: '#eeeeee', icon: '🏛️', type: 'building', height: 4, style: 'columns' },
+            22: { id: 22, category: 'leisure', name: 'Stadium', color: '#43a047', icon: '🏟️', type: 'building', height: 3, style: 'stadium' },
+            23: { id: 23, category: 'leisure', name: 'Hotel', color: '#00bcd4', icon: '🏨', type: 'building', height: 7, style: 'hotel' },
+            24: { id: 24, category: 'leisure', name: 'Theatre', color: '#b71c1c', icon: '🎭', type: 'building', height: 4, style: 'cinema' },
+            
+            // NOVO MODELO: BAR
+            25: { id: 25, category: 'leisure', name: 'Bar', color: '#880e4f', icon: '🍹', type: 'model', modelUrl: 'https://profjoaoav.github.io/cidade/Bar.glb', height: 2, style: 'shop_awning', modelScale: 2.0 },
+        };
+
+        const GRID_SIZE = 20;
+        const BLOCK_SIZE = 10;
+        let grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+        let currentTool = 1;
+        let currentMode = 'free';
+        let activeCategory = 'basic';
+        let currentMissionIndex = 0;
+        
+        let scene, camera, renderer, controls;
+        let gameBlocks = [];
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let prevTime = 0;
+        let playerPos = null; 
+        let playerMesh = null;
+        let raycaster = null;
+        let animationFrameId;
+
+        // --- UI E ESTUDO ---
+        function openStudyRoom() { document.getElementById('study-screen').classList.remove('hidden'); }
+        function closeStudyRoom() { document.getElementById('study-screen').classList.add('hidden'); }
+        
+        function switchStudyTab(tabName) {
+            document.getElementById('tab-places').classList.remove('active');
+            document.getElementById('tab-directions').classList.remove('active');
+            document.getElementById('content-places').classList.add('hidden');
+            document.getElementById('content-directions').classList.add('hidden');
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+        }
+
+        function initUI() {
+            const gridEl = document.getElementById('grid-container');
+            gridEl.innerHTML = '';
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.id = `cell-${x}-${y}`;
+                    cell.onmousedown = (e) => handleGridInteraction(x, y, e);
+                    cell.onmouseenter = (e) => { if(e.buttons === 1) handleGridInteraction(x, y, e); }
+                    gridEl.appendChild(cell);
+                }
+            }
+            renderTools();
+            renderGrid();
+        }
+
+        function setCategory(cat, element = null) {
+            activeCategory = cat;
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            if (element) element.classList.add('active');
+            else document.querySelectorAll('.category-tab').forEach(t => { if(t.innerText.toLowerCase().includes(cat)) t.classList.add('active'); });
+            renderTools();
+        }
+
+        function renderTools() {
+            const toolsContainer = document.getElementById('tools-container');
+            toolsContainer.innerHTML = '';
+            
+            Object.values(BUILDINGS).forEach(b => {
+                if (b.category === activeCategory) {
+                    const btn = document.createElement('div');
+                    btn.className = `tool-btn ${b.id === currentTool ? 'active' : ''}`;
+                    btn.onclick = () => { currentTool = b.id; renderTools(); };
+                    
+                    const is3DModel = b.type === 'model' ? '<span class="text-[8px] bg-blue-600 text-white px-1 rounded absolute top-1 right-1">3D</span>' : '';
+                    
+                    btn.innerHTML = `
+                        <div class="relative w-full text-center">
+                            ${is3DModel}
+                            <div class="text-3xl mb-1">${b.icon}</div>
+                            <div class="text-[10px] font-bold text-gray-800 break-words leading-tight h-6 flex items-center justify-center">${b.name}</div>
+                            <div class="w-full h-2 mt-1 border border-black" style="background-color: ${b.color}"></div>
+                        </div>
+                    `;
+                    toolsContainer.appendChild(btn);
+                }
+            });
+        }
+
+        function handleGridInteraction(x, y, e) {
+            if (e.button === 2 || (e.buttons === 2)) grid[y][x] = 0;
+            else grid[y][x] = currentTool;
+            renderGrid();
+            if (currentMode === 'guided_place') checkPlaceMission();
+        }
+
+        document.getElementById('grid-container').addEventListener('contextmenu', e => e.preventDefault());
+
+        function renderGrid() {
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const cell = document.getElementById(`cell-${x}-${y}`);
+                    const blockId = grid[y][x];
+                    if (blockId === 0) {
+                        cell.style.backgroundColor = 'transparent';
+                        cell.innerHTML = '';
+                    } else {
+                        cell.style.backgroundColor = BUILDINGS[blockId].color;
+                        cell.innerHTML = BUILDINGS[blockId].icon;
+                    }
+                }
+            }
+        }
+
+        function clearGrid() {
+            grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
+            renderGrid();
+        }
+
+        function showMenu() {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('build-screen').classList.add('hidden');
+        }
+
+        function startGame(mode) {
+            currentMode = mode;
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('build-screen').classList.remove('hidden');
+            const panel = document.getElementById('instruction-panel');
+            
+            if (mode === 'free') {
+                panel.classList.add('hidden');
+                clearGrid();
+            } else if (mode === 'guided_place') {
+                panel.classList.remove('hidden');
+                currentMissionIndex = 0;
+                loadPlaceMission();
+            } else if (mode === 'guided_move') {
+                setupAdventureMap();
+                currentMissionIndex = 0;
+                enter3D(); 
+            }
+        }
+
+        // --- VERIFICAÇÃO DE MISSÕES DE CONSTRUÇÃO ---
+        function getCoordsOf(targetId) {
+            let coords = [];
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=0; x<GRID_SIZE; x++) {
+                    if(grid[y][x] === targetId) coords.push({x, y});
+                }
+            }
+            return coords;
+        }
+
+        function loadPlaceMission() {
+            const m = placeMissions[currentMissionIndex];
+            document.getElementById('instruction-panel').innerHTML = 
+                `<div class="text-sm text-yellow-400 mb-2 minecraft-font">Mission ${currentMissionIndex + 1}/${placeMissions.length}</div>` + m.text;
+            m.setup();
+        }
+
+        function checkPlaceMission() {
+            if(placeMissions[currentMissionIndex].check()) {
+                document.getElementById('instruction-panel').innerHTML = `<span class="text-green-400 font-bold text-2xl minecraft-font">Goal Complete! 🟩</span>`;
+                setTimeout(() => {
+                    currentMissionIndex++;
+                    if (currentMissionIndex < placeMissions.length) loadPlaceMission();
+                    else document.getElementById('instruction-panel').innerHTML = `<span class="text-yellow-400 font-bold">Missions Complete! Click <b>ENTRAR EM 3D</b>.</span>`;
+                }, 2500);
+            }
+        }
+
+        function checkAdjacency(id1, id2) {
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=0; x<GRID_SIZE; x++) {
+                    if(grid[y][x] === id1) {
+                        if (x>0 && grid[y][x-1]===id2) return true;
+                        if (x<GRID_SIZE-1 && grid[y][x+1]===id2) return true;
+                        if (y>0 && grid[y-1][x]===id2) return true;
+                        if (y<GRID_SIZE-1 && grid[y+1][x]===id2) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function checkBetween(targetId, border1, border2) {
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=1; x<GRID_SIZE-1; x++) {
+                    if(grid[y][x] === targetId && ((grid[y][x-1]===border1 && grid[y][x+1]===border2) || (grid[y][x-1]===border2 && grid[y][x+1]===border1))) return true;
+                }
+            }
+            for(let x=0; x<GRID_SIZE; x++) {
+                for(let y=1; y<GRID_SIZE-1; y++) {
+                    if(grid[y][x] === targetId && ((grid[y-1][x]===border1 && grid[y+1][x]===border2) || (grid[y-1][x]===border2 && grid[y+1][x]===border1))) return true;
+                }
+            }
+            return false;
+        }
+
+        function checkOpposite(id1, id2, separator) {
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=0; x<GRID_SIZE-2; x++) {
+                    if(grid[y][x]===id1 && grid[y][x+1]===separator && grid[y][x+2]===id2) return true;
+                    if(grid[y][x]===id2 && grid[y][x+1]===separator && grid[y][x+2]===id1) return true;
+                }
+            }
+            for(let x=0; x<GRID_SIZE; x++) {
+                for(let y=0; y<GRID_SIZE-2; y++) {
+                    if(grid[y][x]===id1 && grid[y+1][x]===separator && grid[y+2][x]===id2) return true;
+                    if(grid[y][x]===id2 && grid[y+1][x]===separator && grid[y+2][x]===id1) return true;
+                }
+            }
+            return false;
+        }
+
+        function loadMoveMission() {
+            if (currentMissionIndex >= moveMissions.length) {
+                document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font">ALL MISSIONS COMPLETE!</span>`;
+                setTimeout(exit3D, 4000);
+                return;
+            }
+            const m = moveMissions[currentMissionIndex];
+            document.getElementById('instruction-panel-3d').innerHTML = m.text;
+            if (playerPos) moveMissionStartPos = playerPos.clone();
+        }
+
+        // Utilitário para criar missões de forma limpa
+        function createHStreet(y, startX, endX) { for(let i=startX; i<=endX; i++) grid[y][i] = 1; }
+        function createVStreet(x, startY, endY) { for(let i=startY; i<=endY; i++) grid[i][x] = 1; }
+
+        // --- 30 MISSÕES DE CONSTRUÇÃO (BUILDER) ---
+        const placeMissions = [
+            // FÁCIL (1-10) - Colocar 1 edifício com preposições simples
+            { text: "<span class='level-badge lvl-easy'>Easy 1/10</span><br>Find the <span class='highlight-place'>Bank</span>. Put a <span class='highlight-place'>Bakery</span> <span class='highlight-prep'>next to</span> it.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 7; renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => checkAdjacency(12, 7) },
+            { text: "<span class='level-badge lvl-easy'>Easy 2/10</span><br>We have a <span class='highlight-place'>Hospital</span> and a <span class='highlight-place'>Supermarket</span>. Put a <span class='highlight-place'>Chemist's</span> <span class='highlight-prep'>between</span> them.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][8] = 4; grid[9][12] = 13; renderGrid(); setCategory('shops'); currentTool = 15; renderTools(); }, check: () => checkBetween(15, 4, 13) },
+            { text: "<span class='level-badge lvl-easy'>Easy 3/10</span><br>Find the <span class='highlight-place'>Park</span>. Put a <span class='highlight-place'>Cinema</span> <span class='highlight-prep'>opposite</span> the Park (across the road).", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 2; renderGrid(); setCategory('leisure'); currentTool = 20; renderTools(); }, check: () => checkOpposite(20, 2, 1) },
+            { text: "<span class='level-badge lvl-easy'>Easy 4/10</span><br>Here is the <span class='highlight-place'>School</span>. Put a <span class='highlight-place'>Fire Station</span> <span class='highlight-prep'>behind</span> it (above it on the map).", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 3; renderGrid(); setCategory('services'); currentTool = 6; renderTools(); }, check: () => { let s=getCoordsOf(3); return s.length>0 && grid[s[0].y-1][s[0].x]===6; } },
+            { text: "<span class='level-badge lvl-easy'>Easy 5/10</span><br>Find the <span class='highlight-place'>Train Station</span>. Put a <span class='highlight-place'>Hotel</span> <span class='highlight-prep'>in front of</span> it (below it on the map, next to the road).", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[8][10] = 10; renderGrid(); setCategory('leisure'); currentTool = 23; renderTools(); }, check: () => { let s=getCoordsOf(10); return s.length>0 && grid[s[0].y+1][s[0].x]===23; } },
+            { text: "<span class='level-badge lvl-easy'>Easy 6/10</span><br>We need a <span class='highlight-place'>Post Office</span> <span class='highlight-prep'>next to</span> the <span class='highlight-place'>Train Station</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 10; renderGrid(); setCategory('services'); currentTool = 8; renderTools(); }, check: () => checkAdjacency(8, 10) },
+            { text: "<span class='level-badge lvl-easy'>Easy 7/10</span><br>Put a <span class='highlight-place'>Sports Shop</span> <span class='highlight-prep'>opposite</span> the <span class='highlight-place'>Stadium</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 22; renderGrid(); setCategory('shops'); currentTool = 19; renderTools(); }, check: () => checkOpposite(19, 22, 1) },
+            { text: "<span class='level-badge lvl-easy'>Easy 8/10</span><br>Put a <span class='highlight-place'>Flower Shop</span> <span class='highlight-prep'>between</span> the <span class='highlight-place'>Bakery</span> and the <span class='highlight-place'>Clothes Shop</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][7] = 12; grid[9][11] = 16; renderGrid(); setCategory('shops'); currentTool = 17; renderTools(); }, check: () => checkBetween(17, 12, 16) },
+            { text: "<span class='level-badge lvl-easy'>Easy 9/10</span><br>Put the <span class='highlight-place'>Police Station</span> <span class='highlight-prep'>next to</span> the <span class='highlight-place'>Hospital</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 4; renderGrid(); setCategory('services'); currentTool = 5; renderTools(); }, check: () => checkAdjacency(5, 4) },
+            { text: "<span class='level-badge lvl-easy'>Easy 10/10</span><br>Put a <span class='highlight-place'>Museum</span> <span class='highlight-prep'>opposite</span> the <span class='highlight-place'>School</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 3; renderGrid(); setCategory('leisure'); currentTool = 21; renderTools(); }, check: () => checkOpposite(21, 3, 1) },
+            
+            // MÉDIO (11-20) - Colocar 2 edifícios, cruzamentos, corners
+            { text: "<span class='level-badge lvl-medium'>Medium 11/20</span><br>We have a crossroad! Put a <span class='highlight-place'>Newsagent's</span> <span class='highlight-prep'>on the corner</span> (top-left).", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 18; renderTools(); }, check: () => grid[9][9] === 18 },
+            { text: "<span class='level-badge lvl-medium'>Medium 12/20</span><br>Put a <span class='highlight-place'>Butcher's</span> <span class='highlight-prep'>next to</span> the <span class='highlight-place'>Bakery</span>, and a <span class='highlight-place'>Chemist's</span> <span class='highlight-prep'>next to</span> the Butcher's.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][8] = 12; renderGrid(); setCategory('shops'); currentTool = 14; renderTools(); }, check: () => checkAdjacency(14, 12) && checkAdjacency(15, 14) },
+            { text: "<span class='level-badge lvl-medium'>Medium 13/20</span><br>Put a <span class='highlight-place'>Park</span>. Then put a <span class='highlight-place'>School</span> <span class='highlight-prep'>opposite</span> the Park.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => checkOpposite(3, 2, 1) },
+            { text: "<span class='level-badge lvl-medium'>Medium 14/20</span><br>Put a <span class='highlight-place'>Hotel</span> <span class='highlight-prep'>on the corner</span> (bottom-right) of the crossroads.", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('leisure'); currentTool = 23; renderTools(); }, check: () => grid[11][11] === 23 },
+            { text: "<span class='level-badge lvl-medium'>Medium 15/20</span><br>Put a <span class='highlight-place'>Theatre</span> <span class='highlight-prep'>between</span> the <span class='highlight-place'>Museum</span> and the <span class='highlight-place'>Cinema</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][8] = 21; grid[9][12] = 20; renderGrid(); setCategory('leisure'); currentTool = 24; renderTools(); }, check: () => checkBetween(24, 21, 20) },
+            { text: "<span class='level-badge lvl-medium'>Medium 16/20</span><br>Put a <span class='highlight-place'>Church</span> <span class='highlight-prep'>opposite</span> the <span class='highlight-place'>Hospital</span>, and a <span class='highlight-place'>Park</span> <span class='highlight-prep'>next to</span> the Church.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 4; renderGrid(); setCategory('services'); currentTool = 9; renderTools(); }, check: () => checkOpposite(9, 4, 1) && checkAdjacency(2, 9) },
+            { text: "<span class='level-badge lvl-medium'>Medium 17/20</span><br>Put a <span class='highlight-place'>Bank</span>. Then put a <span class='highlight-place'>Post Office</span> <span class='highlight-prep'>behind</span> it.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 7; renderTools(); }, check: () => { let b=getCoordsOf(7); return b.length>0 && grid[b[0].y-1][b[0].x]===8; } },
+            { text: "<span class='level-badge lvl-medium'>Medium 18/20</span><br>Put a <span class='highlight-place'>Train Station</span> <span class='highlight-prep'>on the corner</span> (top-right).", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 10; renderTools(); }, check: () => grid[9][11] === 10 },
+            { text: "<span class='level-badge lvl-medium'>Medium 19/20</span><br>Put a <span class='highlight-place'>Supermarket</span> <span class='highlight-prep'>opposite</span> the <span class='highlight-place'>School</span>, and a <span class='highlight-place'>Bakery</span> <span class='highlight-prep'>next to</span> the Supermarket.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 3; renderGrid(); setCategory('shops'); currentTool = 13; renderTools(); }, check: () => checkOpposite(13, 3, 1) && checkAdjacency(12, 13) },
+            { text: "<span class='level-badge lvl-medium'>Medium 20/20</span><br>Put the <span class='highlight-place'>Airport</span>. Put a <span class='highlight-place'>Hotel</span> <span class='highlight-prep'>opposite</span> the Airport.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 11; renderTools(); }, check: () => checkOpposite(23, 11, 1) },
+
+            // DIFÍCIL (21-30) - Mais contexto, múltiplas colocações
+            { text: "<span class='level-badge lvl-hard'>Hard 21/30</span><br>Build a Shopping Street! Place a <span class='highlight-place'>Bakery</span>, a <span class='highlight-place'>Clothes Shop</span>, and a <span class='highlight-place'>Chemist's</span> side-by-side (next to each other).", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => (checkAdjacency(12, 16) && checkAdjacency(16, 15)) || (checkAdjacency(16, 12) && checkAdjacency(12, 15)) || (checkAdjacency(12, 15) && checkAdjacency(15, 16)) },
+            { text: "<span class='level-badge lvl-hard'>Hard 22/30</span><br>Build a Shopping Street! Place a <span class='highlight-place'>Bakery</span>, a <span class='highlight-place'>Clothes Shop</span>, and a <span class='highlight-place'>Chemist's</span> side-by-side.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => (checkAdjacency(12, 16) && checkAdjacency(16, 15)) || (checkAdjacency(16, 12) && checkAdjacency(12, 15)) || (checkAdjacency(12, 15) && checkAdjacency(15, 16)) },
+            { text: "<span class='level-badge lvl-hard'>Hard 23/30</span><br>Place a <span class='highlight-place'>Park</span>. Put a <span class='highlight-place'>Museum</span> <span class='highlight-prep'>behind</span> it, and a <span class='highlight-place'>Cinema</span> <span class='highlight-prep'>next to</span> the Museum.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => { let p=getCoordsOf(2); return p.length>0 && grid[p[0].y-1][p[0].x]===21 && checkAdjacency(20, 21); } },
+            { text: "<span class='level-badge lvl-hard'>Hard 24/30</span><br>Fill the corners! Put a <span class='highlight-place'>Bank</span> (top-left), a <span class='highlight-place'>Post Office</span> (top-right), and a <span class='highlight-place'>Police Station</span> (bottom-left).", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 7; renderTools(); }, check: () => grid[9][9]===7 && grid[9][11]===8 && grid[11][9]===5 },
+            { text: "<span class='level-badge lvl-hard'>Hard 25/30</span><br>Put a <span class='highlight-place'>School</span>. Put a <span class='highlight-place'>Park</span> <span class='highlight-prep'>opposite</span> the School, and a <span class='highlight-place'>Library</span> (Museum icon) <span class='highlight-prep'>next to</span> the School.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 3; renderTools(); }, check: () => checkOpposite(2, 3, 1) && checkAdjacency(21, 3) },
+            { text: "<span class='level-badge lvl-hard'>Hard 26/30</span><br>Create a row: <span class='highlight-place'>Fire Station</span>, then <span class='highlight-place'>Police Station</span>, then <span class='highlight-place'>Hospital</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 6; renderTools(); }, check: () => checkAdjacency(6, 5) && checkAdjacency(5, 4) },
+            { text: "<span class='level-badge lvl-hard'>Hard 27/30</span><br>Put the <span class='highlight-place'>Stadium</span>. Put a <span class='highlight-place'>Sports Shop</span> <span class='highlight-prep'>in front of</span> it (below it), and a <span class='highlight-place'>Park</span> <span class='highlight-prep'>next to</span> the Sports Shop.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('leisure'); currentTool = 22; renderTools(); }, check: () => { let s=getCoordsOf(22); return s.length>0 && grid[s[0].y+1][s[0].x]===19 && checkAdjacency(2, 19); } },
+            { text: "<span class='level-badge lvl-hard'>Hard 28/30</span><br>Put a <span class='highlight-place'>Church</span> <span class='highlight-prep'>on the corner</span> (bottom-right). Put a <span class='highlight-place'>Flower Shop</span> <span class='highlight-prep'>opposite</span> the Church.", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 9; renderTools(); }, check: () => grid[11][11]===9 && checkOpposite(17, 9, 1) },
+            { text: "<span class='level-badge lvl-hard'>Hard 29/30</span><br>Make a street! Place <span class='highlight-place'>Road</span> across the map. Put a <span class='highlight-place'>Train Station</span>, and <span class='highlight-place'>opposite</span> it put a <span class='highlight-place'>Hotel</span>.", setup: () => { clearGrid(); renderGrid(); setCategory('basic'); currentTool = 1; renderTools(); }, check: () => checkOpposite(10, 23, 1) },
+            { text: "<span class='level-badge lvl-hard'>Hard 30/30</span><br>The Ultimate City Block! Place a <span class='highlight-place'>Park</span>. Put a <span class='highlight-place'>Bakery</span> <span class='highlight-prep'>next to</span> the Park, and a <span class='highlight-place'>Bank</span> <span class='highlight-prep'>opposite</span> the Bakery.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => checkAdjacency(12, 2) && checkOpposite(7, 12, 1) }
+        ];
+
+        // --- MAPA DA MEGA CIDADE PARA A MISSÃO EXPLORER ---
+        function setupAdventureMap() {
+            clearGrid();
+            // Ruas (Grelha 3x3)
+            for(let i=1; i<19; i++) { 
+                grid[6][i] = 1; grid[14][i] = 1; 
+                grid[i][6] = 1; grid[i][14] = 1; 
+            }
+            
+            // Centro (Parque Gigante)
+            for(let y=7; y<=13; y++) for(let x=7; x<=13; x++) grid[y][x] = 2;
+
+            // Quarteirão NW (Serviços)
+            grid[5][4] = 3; // School
+            grid[5][5] = 21; // Museum (Library)
+            grid[4][5] = 8; // Post Office
+
+            // Quarteirão N (Lojas)
+            grid[5][7] = 13; // Supermarket (Corner)
+            grid[5][9] = 12; // Bakery
+            grid[5][11] = 14; // Butcher
+            grid[5][13] = 15; // Chemist (Corner)
+
+            // Quarteirão NE (Emergência)
+            grid[5][15] = 4; // Hospital (Corner)
+            grid[4][15] = 5; // Police
+            grid[3][15] = 6; // Fire Station
+
+            // Quarteirão W (Lazer e Lojas)
+            grid[7][5] = 20; // Cinema (Corner)
+            grid[9][5] = 24; // Theatre
+            grid[11][5] = 16; // Clothes Shop
+
+            // Quarteirão E (Desporto e Viagem)
+            grid[7][15] = 22; // Stadium (Corner)
+            grid[9][15] = 19; // Sports Shop
+            grid[11][15] = 11; // Airport
+
+            // Quarteirão SW (Transportes)
+            grid[15][5] = 10; // Train Station (Corner)
+
+            // Quarteirão S (Negócios)
+            grid[15][7] = 7; // Bank (Corner)
+            grid[15][9] = 18; // Newsagent
+            grid[15][13] = 23; // Hotel (Corner)
+
+            // Quarteirão SE (Religião e Flores)
+            grid[15][15] = 9; // Church (Corner)
+            grid[16][15] = 17; // Flower Shop
+        }
+
+        // --- 30 MISSÕES DE MOVIMENTO (EXPLORER) - Rota Gigante Pela Cidade ---
+        const moveMissions = [
+            // FÁCIL (1-10) - Andar a direito ou virar 1 vez
+            { text: "<span class='level-badge lvl-easy'>Easy 1/10</span><br>Go <span class='highlight-prep'>straight ahead</span>. The <span class='highlight-place'>Hospital</span> is <span class='highlight-prep'>on your right</span>. Go there!", targetId: 4, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-easy'>Easy 2/10</span><br>Walk <span class='highlight-prep'>past</span> the Hospital. Find the <span class='highlight-place'>Police Station</span> <span class='highlight-prep'>next to</span> it.", targetId: 5, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-easy'>Easy 3/10</span><br>Go back to the crossroads. <span class='highlight-prep'>Turn right</span> and find the <span class='highlight-place'>Chemist's</span> <span class='highlight-prep'>on the corner</span>.", targetId: 15, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-easy'>Easy 4/10</span><br>Walk <span class='highlight-prep'>along</span> the street. Find the <span class='highlight-place'>Bakery</span>.", targetId: 12, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-easy'>Easy 5/10</span><br>Go <span class='highlight-prep'>straight ahead</span> to the <span class='highlight-place'>Supermarket</span>. It's <span class='highlight-prep'>on the corner</span>.", targetId: 13, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-easy'>Easy 6/10</span><br><span class='highlight-prep'>Cross</span> the street to find the <span class='highlight-place'>Cinema</span>.", targetId: 20, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-easy'>Easy 7/10</span><br>Look! There is a huge <span class='highlight-place'>Park</span>. Walk <span class='highlight-prep'>towards</span> the Park.", targetId: 2, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-easy'>Easy 8/10</span><br>Walk <span class='highlight-prep'>through</span> the <span class='highlight-place'>Park</span>. 🌳", targetId: 2, check: (dist, inObj) => inObj === 2 },
+            { text: "<span class='level-badge lvl-easy'>Easy 9/10</span><br>Exit the Park on the other side. Find the <span class='highlight-place'>Bank</span>.", targetId: 7, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-easy'>Easy 10/10</span><br>Walk <span class='highlight-prep'>past</span> the Bank to find the <span class='highlight-place'>Train Station</span> <span class='highlight-prep'>on the corner</span>.", targetId: 10, check: (dist) => dist < 18 },
+            
+            // MÉDIO (11-20) - Cruzamentos, primeira/segunda rua
+            { text: "<span class='level-badge lvl-medium'>Medium 11/20</span><br><span class='highlight-prep'>Turn left</span> at the crossroads. Find the <span class='highlight-place'>School</span>.", targetId: 3, check: (dist) => dist < 20 },
+            { text: "<span class='level-badge lvl-medium'>Medium 12/20</span><br>Go <span class='highlight-prep'>straight ahead</span>. Take the <span class='highlight-prep'>first road on the left</span>. Find the <span class='highlight-place'>Post Office</span>.", targetId: 8, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-medium'>Medium 13/20</span><br>Turn around! Walk <span class='highlight-prep'>towards</span> the <span class='highlight-place'>Museum</span>.", targetId: 21, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-medium'>Medium 14/20</span><br>Go back to the main street. Walk <span class='highlight-prep'>along</span> the street and find the <span class='highlight-place'>Theatre</span>.", targetId: 24, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-medium'>Medium 15/20</span><br>Walk <span class='highlight-prep'>past</span> the Theatre to the <span class='highlight-place'>Clothes Shop</span>.", targetId: 16, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-medium'>Medium 16/20</span><br>Take the <span class='highlight-prep'>first road on the left</span>. Find the <span class='highlight-place'>Newsagent's</span>.", targetId: 18, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-medium'>Medium 17/20</span><br>Go <span class='highlight-prep'>straight ahead</span> to the <span class='highlight-place'>Hotel</span> <span class='highlight-prep'>on the corner</span>.", targetId: 23, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-medium'>Medium 18/20</span><br><span class='highlight-prep'>Cross</span> the street to the <span class='highlight-place'>Church</span>.", targetId: 9, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-medium'>Medium 19/20</span><br>Walk <span class='highlight-prep'>past</span> the Church to buy some flowers at the <span class='highlight-place'>Flower Shop</span>.", targetId: 17, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-medium'>Medium 20/20</span><br>Turn around. Take the <span class='highlight-prep'>first road on the right</span> to the <span class='highlight-place'>Airport</span>.", targetId: 11, check: (dist) => dist < 18 },
+
+            // DIFÍCIL (21-30) - Instruções compostas
+            { text: "<span class='level-badge lvl-hard'>Hard 21/30</span><br>Walk <span class='highlight-prep'>past</span> the Airport. The <span class='highlight-place'>Sports Shop</span> is <span class='highlight-prep'>on your right</span>.", targetId: 19, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-hard'>Hard 22/30</span><br>Go <span class='highlight-prep'>straight ahead</span>. The <span class='highlight-place'>Stadium</span> is <span class='highlight-prep'>on the corner</span>.", targetId: 22, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-hard'>Hard 23/30</span><br><span class='highlight-prep'>Cross</span> the street and walk <span class='highlight-prep'>through</span> the <span class='highlight-place'>Park</span> again. 🌳", targetId: 2, check: (dist, inObj) => inObj === 2 },
+            { text: "<span class='level-badge lvl-hard'>Hard 24/30</span><br>Exit the park. Walk <span class='highlight-prep'>towards</span> the <span class='highlight-place'>Butcher's</span>. It's <span class='highlight-prep'>between</span> the Chemist's and Bakery.", targetId: 14, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-hard'>Hard 25/30</span><br>Take the <span class='highlight-prep'>second road on the left</span> to find the <span class='highlight-place'>Fire Station</span>.", targetId: 6, check: (dist) => dist < 20 },
+            { text: "<span class='level-badge lvl-hard'>Hard 26/30</span><br>Go <span class='highlight-prep'>straight ahead</span>. <span class='highlight-prep'>Turn right</span> at the crossroads. Go to the <span class='highlight-place'>Cinema</span>.", targetId: 20, check: (dist) => dist < 20 },
+            { text: "<span class='level-badge lvl-hard'>Hard 27/30</span><br>Walk <span class='highlight-prep'>along</span> the street. <span class='highlight-prep'>Cross</span> the road to the <span class='highlight-place'>Train Station</span>.", targetId: 10, check: (dist) => dist < 18 },
+            { text: "<span class='level-badge lvl-hard'>Hard 28/30</span><br>Go <span class='highlight-prep'>straight ahead</span>. Take the <span class='highlight-prep'>first road on the left</span>. Find the <span class='highlight-place'>Bank</span>.", targetId: 7, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-hard'>Hard 29/30</span><br>Walk <span class='highlight-prep'>past</span> the Newsagent's. The <span class='highlight-place'>Hotel</span> is <span class='highlight-prep'>on your right</span>.", targetId: 23, check: (dist) => dist < 15 },
+            { text: "<span class='level-badge lvl-hard'>Hard 30/30</span><br>Final destination! Walk <span class='highlight-prep'>towards</span> the <span class='highlight-place'>Stadium</span> for the football match! ⚽", targetId: 22, check: (dist) => dist < 25 }
+        ];
+
+        // --- TEXTURAS PROCEDURAIS ---
+        function createMinecraftTexture(size, drawFunction) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            drawFunction(ctx, size);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
+            return tex;
+        }
+
+        function getGrassTexture() {
+            // Relva mais suave e com maior resolução (não tão pixelizada)
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#558b2f';
+            ctx.fillRect(0, 0, 512, 512);
+            for(let i=0; i<20000; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#7cb342' : '#33691e';
+                ctx.globalAlpha = Math.random() * 0.4;
+                ctx.fillRect(Math.random()*512, Math.random()*512, 6, 6);
+            }
+            ctx.globalAlpha = 1.0;
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping; 
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.magFilter = THREE.LinearFilter;
+            tex.minFilter = THREE.LinearMipmapLinearFilter;
+            return tex;
+        }
+
+        function getRoadTexture() {
+            return createMinecraftTexture(32, (ctx, s) => {
+                ctx.fillStyle = '#666'; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = '#999'; ctx.fillRect(0,0,s,4); ctx.fillRect(0,28,s,4);
+                ctx.fillRect(0,0,4,s); ctx.fillRect(28,0,4,s);
+                ctx.fillStyle = '#555';
+                for(let i=0; i<100; i++) ctx.fillRect(Math.floor(Math.random()*s), Math.floor(Math.random()*s), 2, 2);
+                ctx.fillStyle = 'white'; ctx.fillRect(14,4,4,8); ctx.fillRect(14,20,4,8);
+                ctx.fillRect(4,14,8,4); ctx.fillRect(20,14,8,4);
+            });
+        }
+
+        function getBuildingTexture(bData) {
+            return createMinecraftTexture(32, (ctx, s) => {
+                ctx.fillStyle = bData.color; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                for(let i=0; i<80; i++) ctx.fillRect(Math.floor(Math.random()*(s/2))*2, Math.floor(Math.random()*(s/2))*2, 2, 2);
+                ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                for(let y=0; y<s; y+=8) ctx.fillRect(0, y, s, 2);
+                for(let x=0; x<s; x+=8) ctx.fillRect(x, 0, 2, s);
+
+                const glassColor = '#81d4fa';
+                const lightGlassColor = '#e1f5fe';
+                const style = bData.style || 'normal';
+                
+                if (style === 'shop_awning' || style === 'shop_colorful' || style === 'shop_glass' || style === 'shop_cross') {
+                    ctx.fillStyle = glassColor; ctx.fillRect(4, 12, 24, 20);
+                    ctx.fillStyle = lightGlassColor; ctx.fillRect(6, 14, 20, 16);
+                    if(style === 'shop_awning') {
+                        ctx.fillStyle = ['#f44336', '#ffeb3b', '#2196f3'][bData.id % 3];
+                        ctx.fillRect(0, 8, s, 6);
+                        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                        for(let x=0; x<s; x+=8) ctx.fillRect(x, 8, 4, 6);
+                    }
+                    if (style === 'shop_cross') { ctx.fillStyle = 'green'; ctx.fillRect(14, 2, 4, 8); ctx.fillRect(10, 4, 12, 4); }
+                } else if (style === 'hospital') {
+                    ctx.fillStyle = glassColor;
+                    for(let i=4; i<28; i+=8) { ctx.fillRect(4, i, 8, 4); ctx.fillRect(20, i, 8, 4); }
+                    ctx.fillStyle = 'red'; ctx.fillRect(14, 10, 4, 12); ctx.fillRect(10, 14, 12, 4);
+                } else if (style === 'stadium') {
+                    ctx.fillStyle = '#ccc'; ctx.fillRect(0, 0, s, 8);
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fillRect(0, 8, s, 12);
+                } else if (style === 'brick_big_door') { 
+                    ctx.fillStyle = '#333'; ctx.fillRect(6, 12, 20, 20); ctx.fillStyle = '#fbc02d'; ctx.fillRect(6, 12, 20, 2); 
+                } else if (style === 'church') {
+                    ctx.fillStyle = '#81d4fa'; ctx.fillRect(12, 10, 8, 16);
+                    ctx.fillStyle = '#ffeb3b'; ctx.fillRect(14, 2, 4, 8); ctx.fillRect(12, 4, 8, 2);
+                } else if (style === 'hotel') {
+                    ctx.fillStyle = glassColor;
+                    for(let r=4; r<28; r+=6) for(let c=4; c<28; c+=6) ctx.fillRect(c, r, 4, 4); 
+                } else if (style === 'columns') { 
+                    ctx.fillStyle = '#cfd8dc';
+                    for(let c=2; c<32; c+=8) ctx.fillRect(c, 8, 4, 24);
+                    ctx.fillStyle = '#90a4ae'; ctx.fillRect(0, 4, s, 4);
+                } else {
+                    ctx.fillStyle = glassColor;
+                    for(let r=4; r<28; r+=10) {
+                        for(let c=4; c<28; c+=10) {
+                            ctx.fillRect(c, r, 6, 6); ctx.fillStyle = lightGlassColor; ctx.fillRect(c+2, r+2, 2, 2); ctx.fillStyle = glassColor;
+                        }
+                    }
+                }
+                
+                if(!['shop_awning', 'shop_colorful', 'shop_glass', 'shop_cross', 'brick_big_door', 'stadium'].includes(style)) {
+                    ctx.fillStyle = '#4e342e'; ctx.fillRect(12, 20, 8, 12); 
+                }
+            });
+        }
+
+        function getLeafTexture() {
+            return createMinecraftTexture(16, (ctx, s) => {
+                const colors = ['#1b5e20', '#2e7d32', '#388e3c', '#000'];
+                for(let y=0; y<s; y++) for(let x=0; x<s; x++) { ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)]; ctx.fillRect(x,y,1,1); }
+            });
+        }
+        function getWoodTexture() {
+            return createMinecraftTexture(16, (ctx, s) => {
+                ctx.fillStyle = '#5d4037'; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = '#3e2723';
+                for(let i=0; i<5; i++) ctx.fillRect(0, Math.random()*s, s, 1);
+            });
+        }
+
+        // --- SISTEMA 3D COM SOMBRAS ---
+        function init3D() {
+            if(scene) return; 
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.Fog(0x87CEEB, 30, 150);
+
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: false }); 
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio > 1 ? 1 : 1); 
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            document.getElementById('canvas-container').innerHTML = '';
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); 
+            scene.add(ambientLight);
+            
+            const dirLight = new THREE.DirectionalLight(0xfffae6, 0.8); 
+            dirLight.position.set(50, 100, 50);
+            dirLight.castShadow = true; 
+            dirLight.shadow.camera.near = 0.5; dirLight.shadow.camera.far = 500;
+            dirLight.shadow.camera.left = -100; dirLight.shadow.camera.right = 100;
+            dirLight.shadow.camera.top = 100; dirLight.shadow.camera.bottom = -100;
+            dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048;
+            scene.add(dirLight);
+
+            raycaster = new THREE.Raycaster();
+
+            if (typeof THREE !== 'undefined' && typeof THREE.PointerLockControls !== 'undefined') {
+                controls = new THREE.PointerLockControls(camera, renderer.domElement);
+                
+                document.getElementById('btn-lock-pointer').addEventListener('click', () => controls.lock());
+
+                controls.addEventListener('lock', () => {
+                    document.getElementById('start-3d-overlay').classList.add('hidden');
+                    document.getElementById('btn-exit-3d').classList.remove('hidden');
+                    document.getElementById('crosshair').style.display = 'block';
+                    
+                    if(currentMode === 'guided_move') {
+                        if(playerPos) moveMissionStartPos = playerPos.clone();
+                        loadMoveMission();
+                    }
+                });
+
+                controls.addEventListener('unlock', () => {
+                    if(document.getElementById('canvas-container').classList.contains('hidden')) return;
+                    document.getElementById('start-3d-overlay').classList.remove('hidden');
+                    document.getElementById('crosshair').style.display = 'none';
+                    document.getElementById('target-info-panel').classList.add('hidden');
+                });
+
+                scene.add(controls.getObject());
+            }
+
+            const onKeyDown = (e) => {
+                switch(e.code){ case 'ArrowUp': case 'KeyW': moveForward = true; break; case 'ArrowLeft': case 'KeyA': moveLeft = true; break; case 'ArrowDown': case 'KeyS': moveBackward = true; break; case 'ArrowRight': case 'KeyD': moveRight = true; break; }
+            };
+            const onKeyUp = (e) => {
+                switch(e.code){ case 'ArrowUp': case 'KeyW': moveForward = false; break; case 'ArrowLeft': case 'KeyA': moveLeft = false; break; case 'ArrowDown': case 'KeyS': moveBackward = false; break; case 'ArrowRight': case 'KeyD': moveRight = false; break; }
+            };
+            document.addEventListener('keydown', onKeyDown); document.addEventListener('keyup', onKeyUp);
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createTextSprite(message, icon) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512; canvas.height = 128;
+            
+            context.fillStyle = "rgba(0, 0, 0, 0.6)";
+            context.fillRect(0, 0, 512, 128);
+            context.strokeStyle = "white"; context.lineWidth = 4; context.strokeRect(0, 0, 512, 128);
+
+            context.font = "Bold 40px 'Courier New'"; context.fillStyle = "white";
+            context.textAlign = "center"; context.textBaseline = "middle";
+            context.fillText(icon + " " + message, 256, 64);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false }); 
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(10, 2.5, 1);
+            return sprite;
+        }
+
+        // --- SISTEMA DE CARREGAMENTO DO JOGADOR GLB ---
+        function createPlayerModel() {
+            const playerGroup = new THREE.Group();
+            
+            // Fallback (Steve procedural) enquanto o GLB descarrega
+            const fallbackGroup = new THREE.Group();
+            const skinMat = new THREE.MeshLambertMaterial({color: 0xe0ac69}); 
+            const shirtMat = new THREE.MeshLambertMaterial({color: 0x00aaff}); 
+            const pantsMat = new THREE.MeshLambertMaterial({color: 0x0000aa}); 
+            
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), skinMat);
+            head.position.y = 2.8; head.castShadow = true;
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.4), shirtMat);
+            body.position.y = 1.8; body.castShadow = true;
+            const armL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.4), skinMat);
+            armL.position.set(-0.55, 1.8, 0); armL.castShadow = true;
+            const armR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.4), skinMat);
+            armR.position.set(0.55, 1.8, 0); armR.castShadow = true;
+            const legL = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.2, 0.4), pantsMat);
+            legL.position.set(-0.2, 0.6, 0); legL.castShadow = true;
+            const legR = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.2, 0.4), pantsMat);
+            legR.position.set(0.2, 0.6, 0); legR.castShadow = true;
+
+            fallbackGroup.add(head, body, armL, armR, legL, legR);
+            fallbackGroup.scale.set(1.5, 1.5, 1.5);
+            playerGroup.add(fallbackGroup);
+
+            // Carregar modelo externo na internet
+            if (typeof THREE.GLTFLoader !== 'undefined') {
+                const loader = new THREE.GLTFLoader();
+                loader.load('https://profjoaoav.github.io/cidade/player.glb', (gltf) => {
+                    const model = gltf.scene;
+                    
+                    playerGroup.remove(fallbackGroup);
+                    
+                    const box = new THREE.Box3().setFromObject(model);
+                    const size = box.getSize(new THREE.Vector3());
+                    // Aumentado para 5.5 para o jogador ficar maior e mais proporcional aos prédios
+                    const targetScale = 5.5 / size.y; 
+                    
+                    model.scale.set(targetScale, targetScale, targetScale);
+                    
+                    const center = box.getCenter(new THREE.Vector3());
+                    const bottom = box.min.y;
+                    
+                    model.rotation.y = Math.PI; 
+                    
+                    model.position.set(-center.x * targetScale, -bottom * targetScale, -center.z * targetScale);
+                    
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+
+                    playerGroup.add(model);
+                }, undefined, (error) => {
+                    console.warn("Aviso: O ficheiro player.glb não conseguiu ser descarregado. Será usado o boneco procedural de blocos.", error);
+                });
+            }
+
+            return playerGroup;
+        }
+
+        function createProceduralTree() {
+            const tree = new THREE.Group();
+            const woodTex = getWoodTexture();
+            const leafTex = getLeafTexture();
+            
+            const trunk = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 2), new THREE.MeshStandardMaterial({map: woodTex}));
+            trunk.position.y = 2; trunk.castShadow = true; trunk.receiveShadow = true;
+            const leaves = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 6), new THREE.MeshStandardMaterial({map: leafTex}));
+            leaves.position.y = 7; leaves.castShadow = true; leaves.receiveShadow = true;
+            
+            tree.add(trunk, leaves);
+            return tree;
+        }
+
+        function buildCity3D() {
+            gameBlocks.forEach(b => scene.remove(b));
+            if (playerMesh) scene.remove(playerMesh);
+            gameBlocks = [];
+
+            const grassTex = getGrassTexture();
+            grassTex.repeat.set(GRID_SIZE, GRID_SIZE); grassTex.wrapS = THREE.RepeatWrapping; grassTex.wrapT = THREE.RepeatWrapping;
+            
+            const floorGeo = new THREE.PlaneGeometry(GRID_SIZE * BLOCK_SIZE * 2, GRID_SIZE * BLOCK_SIZE * 2);
+            const floorMat = new THREE.MeshLambertMaterial({ map: grassTex });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true; 
+            scene.add(floor);
+
+            const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+            const roadTex = getRoadTexture();
+
+            if (!playerPos) playerPos = new THREE.Vector3(0, 0, 0);
+            
+            if(currentMode === 'guided_move') {
+                playerPos.set( (14 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2), 0, (17 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2) );
+            } else {
+                playerPos.set(0, 0, 0); 
+            }
+            
+            playerMesh = createPlayerModel();
+            if(currentMode === 'guided_move') playerMesh.rotation.y = Math.PI; 
+            scene.add(playerMesh);
+
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const id = grid[y][x];
+                    if (id === 0) continue;
+
+                    const bData = BUILDINGS[id];
+                    const posX = (x * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                    const posZ = (y * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+
+                    if (bData.type === 'road') {
+                        const geo = new THREE.PlaneGeometry(BLOCK_SIZE, BLOCK_SIZE);
+                        const mat = new THREE.MeshStandardMaterial({ map: roadTex });
+                        const mesh = new THREE.Mesh(geo, mat);
+                        mesh.rotation.x = -Math.PI / 2; mesh.position.set(posX, 0.05, posZ);
+                        mesh.receiveShadow = true;
+                        scene.add(mesh);
+                        mesh.userData = { id: id, x, y };
+                        gameBlocks.push(mesh);
+                    } else if (bData.type === 'nature') {
+                        const baseGeo = new THREE.BoxGeometry(BLOCK_SIZE, 0.1, BLOCK_SIZE);
+                        const baseMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32 });
+                        const mesh = new THREE.Mesh(baseGeo, baseMat);
+                        mesh.position.set(posX, 0.05, posZ);
+                        mesh.receiveShadow = true;
+                        
+                        const tree = createProceduralTree();
+                        tree.position.set(posX, 0.1, posZ);
+                        scene.add(mesh, tree);
+                        
+                        mesh.userData = { id: id, isSolid: false, x, y, name: bData.name, icon: bData.icon };
+                        
+                        const hitGeo = new THREE.BoxGeometry(2, 10, 2);
+                        const hitMesh = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({visible:false}));
+                        hitMesh.position.set(posX, 5, posZ);
+                        hitMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon }; 
+                        scene.add(hitMesh);
+                        gameBlocks.push(hitMesh);
+                        
+                    } else {
+                        // Construção normal ou Fallback para o modelo GLB da internet
+                        const height = (bData.height || 2.5) * 4; 
+                        const geo = new THREE.BoxGeometry(BLOCK_SIZE, height, BLOCK_SIZE);
+                        const tex = getBuildingTexture(bData);
+                        const mat = new THREE.MeshStandardMaterial({ map: tex });
+                        const fallbackMesh = new THREE.Mesh(geo, mat);
+                        fallbackMesh.position.set(posX, height / 2, posZ);
+                        fallbackMesh.castShadow = true; 
+                        fallbackMesh.receiveShadow = true;
+                        scene.add(fallbackMesh);
+
+                        const sprite = createTextSprite(bData.name, bData.icon);
+                        sprite.position.y = height + 3;
+                        fallbackMesh.add(sprite);
+
+                        fallbackMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon };
+                        gameBlocks.push(fallbackMesh);
+
+                        // Lógica de substituição assíncrona se for um modelo externo
+                        if (bData.type === 'model' && bData.modelUrl) {
+                            if (typeof THREE.GLTFLoader !== 'undefined') {
+                                const loader = new THREE.GLTFLoader();
+                                loader.load(bData.modelUrl, (gltf) => {
+                                    const model = gltf.scene;
+
+                                    // Removemos a caixa de fallback do cenário
+                                    scene.remove(fallbackMesh);
+                                    const index = gameBlocks.indexOf(fallbackMesh);
+                                    if (index > -1) gameBlocks.splice(index, 1);
+
+                                    // Calculamos a escala para caber exatamente na rua (limite BLOCK_SIZE)
+                                    const box = new THREE.Box3().setFromObject(model);
+                                    const size = box.getSize(new THREE.Vector3());
+                                    const maxDim = Math.max(size.x, size.z);
+                                    let targetScale = (BLOCK_SIZE * 0.9) / maxDim;
+
+                                    // Aplica a escala customizada se definida no objeto BUILDINGS (resolve o problema da Bakery pequena)
+                                    if (bData.modelScale) {
+                                        targetScale *= bData.modelScale;
+                                    }
+
+                                    model.scale.set(targetScale, targetScale, targetScale);
+
+                                    const center = box.getCenter(new THREE.Vector3());
+                                    const bottom = box.min.y;
+
+                                    model.position.set(posX - (center.x * targetScale), -bottom * targetScale, posZ - (center.z * targetScale));
+
+                                    model.traverse((child) => {
+                                        if (child.isMesh) {
+                                            child.castShadow = true;
+                                            child.receiveShadow = true;
+                                        }
+                                    });
+                                    scene.add(model);
+
+                                    // Voltamos a adicionar o nome e o ícone ao novo edifício 3D
+                                    const newSprite = createTextSprite(bData.name, bData.icon);
+                                    newSprite.position.set(posX, height + 3, posZ);
+                                    scene.add(newSprite);
+
+                                    // Criamos uma caixa de colisão invisível do tamanho do edifício
+                                    const colGeo = new THREE.BoxGeometry(BLOCK_SIZE, height, BLOCK_SIZE);
+                                    const colMat = new THREE.MeshBasicMaterial({visible: false});
+                                    const colMesh = new THREE.Mesh(colGeo, colMat);
+                                    colMesh.position.set(posX, height / 2, posZ);
+                                    colMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon };
+                                    scene.add(colMesh);
+                                    gameBlocks.push(colMesh);
+
+                                }, undefined, (error) => {
+                                    console.warn("Aviso: Falhou o download do modelo " + bData.name, error);
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            camera.rotation.set(0, 0, 0);
+        }
+
+        function enter3D() {
+            document.getElementById('build-screen').classList.add('hidden');
+            document.getElementById('canvas-container').classList.remove('hidden');
+            document.getElementById('ui-3d').classList.remove('hidden');
+            
+            init3D();
+            buildCity3D();
+            
+            if(currentMode === 'guided_move') document.getElementById('instruction-panel-3d').classList.remove('hidden');
+            else document.getElementById('instruction-panel-3d').classList.add('hidden');
+            
+            prevTime = performance.now();
+            if(!animationFrameId) animate();
+        }
+
+        function exit3D() {
+            if (controls && controls.isLocked) controls.unlock();
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+            document.getElementById('canvas-container').classList.add('hidden');
+            document.getElementById('ui-3d').classList.add('hidden');
+            if (currentMode === 'guided_move') {
+                showMenu();
+            } else {
+                document.getElementById('build-screen').classList.remove('hidden');
+            }
+        }
+
+        function onWindowResize() {
+            if(!camera || !renderer) return;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- SISTEMAS DE NAVEGAÇÃO E RAYCASTING INTELIGENTE ---
+        function checkCollisions(newPosition) {
+            const playerRadius = 1.2; 
+            for (let i = 0; i < gameBlocks.length; i++) {
+                if (!gameBlocks[i].userData.isSolid) continue;
+                const box = new THREE.Box3().setFromObject(gameBlocks[i]);
+                box.expandByScalar(playerRadius);
+                if (box.containsPoint(newPosition)) return true;
+            }
+            const limit = (GRID_SIZE * BLOCK_SIZE) / 2;
+            if (Math.abs(newPosition.x) > limit || Math.abs(newPosition.z) > limit) return true;
+            return false;
+        }
+
+        function getLocationSentence(gridX, gridY, targetName) {
+            let sentences = [];
+            
+            const pX = Math.floor((playerPos.x + (GRID_SIZE * BLOCK_SIZE)/2) / BLOCK_SIZE);
+            const pZ = Math.floor((playerPos.z + (GRID_SIZE * BLOCK_SIZE)/2) / BLOCK_SIZE);
+            
+            const dx = gridX - pX;
+            const dz = gridY - pZ;
+            
+            const neighbors = {
+                N: gridY > 0 ? grid[gridY-1][gridX] : 0,
+                S: gridY < GRID_SIZE-1 ? grid[gridY+1][gridX] : 0,
+                W: gridX > 0 ? grid[gridY][gridX-1] : 0,
+                E: gridX < GRID_SIZE-1 ? grid[gridY][gridX+1] : 0,
+                NN: gridY > 1 ? grid[gridY-2][gridX] : 0,
+                SS: gridY < GRID_SIZE-2 ? grid[gridY+2][gridX] : 0,
+                WW: gridX > 1 ? grid[gridY][gridX-2] : 0,
+                EE: gridX < GRID_SIZE-2 ? grid[gridY][gridX+2] : 0
+            };
+            
+            let opposites = [];
+            if (neighbors.N === 1 && neighbors.NN > 1) opposites.push(BUILDINGS[neighbors.NN].name);
+            if (neighbors.S === 1 && neighbors.SS > 1) opposites.push(BUILDINGS[neighbors.SS].name);
+            if (neighbors.E === 1 && neighbors.EE > 1) opposites.push(BUILDINGS[neighbors.EE].name);
+            if (neighbors.W === 1 && neighbors.WW > 1) opposites.push(BUILDINGS[neighbors.WW].name);
+            
+            let adjacents = [];
+            if (neighbors.N > 1) adjacents.push({id: neighbors.N, dir: 'N'});
+            if (neighbors.S > 1) adjacents.push({id: neighbors.S, dir: 'S'});
+            if (neighbors.E > 1) adjacents.push({id: neighbors.E, dir: 'E'});
+            if (neighbors.W > 1) adjacents.push({id: neighbors.W, dir: 'W'});
+            
+            let adjNames = [...new Set(adjacents.map(a => BUILDINGS[a.id].name))];
+
+            if (adjNames.length >= 2) sentences.push(`It is <span class="highlight-prep">between</span> the ${adjNames[0]} and the ${adjNames[1]}.`);
+            else if (adjNames.length === 1) sentences.push(`It is <span class="highlight-prep">next to</span> the ${adjNames[0]}.`);
+            
+            if (opposites.length > 0) sentences.push(`It is <span class="highlight-prep">opposite</span> the ${opposites[0]}.`);
+            
+            // Verificar Corner
+            let isCorner = (neighbors.N===1||neighbors.S===1) && (neighbors.E===1||neighbors.W===1);
+            if(isCorner) sentences.push(`It's <span class="highlight-prep">on the corner</span>.`);
+
+            // In front of / Behind
+            if (Math.abs(dx) > Math.abs(dz)) {
+                const dirX = Math.sign(dx);
+                const behindX = gridX + dirX; 
+                if (behindX >= 0 && behindX < GRID_SIZE && grid[gridY][behindX] > 1) {
+                    sentences.push(`The ${BUILDINGS[grid[gridY][behindX]].name} is <span class="highlight-prep">behind</span> it.`);
+                }
+            } else {
+                const dirZ = Math.sign(dz);
+                const behindZ = gridY + dirZ; 
+                if (behindZ >= 0 && behindZ < GRID_SIZE && grid[behindZ][gridX] > 1) {
+                    sentences.push(`The ${BUILDINGS[grid[behindZ][gridX]].name} is <span class="highlight-prep">behind</span> it.`);
+                }
+            }
+
+            if (sentences.length === 0) return "It is isolated.";
+            return sentences.slice(0, 2).join('<br>');
+        }
+
+        function performRaycasting() {
+            if(!raycaster || !camera) return;
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const intersects = raycaster.intersectObjects(gameBlocks);
+            
+            const panel = document.getElementById('target-info-panel');
+            
+            if (intersects.length > 0 && intersects[0].distance < 60) { 
+                const object = intersects[0].object;
+                if (object.userData.name) { 
+                    const name = object.userData.name;
+                    const icon = object.userData.icon;
+                    const x = object.userData.x;
+                    const y = object.userData.y;
+                    
+                    document.getElementById('target-name').innerText = `${icon} You are looking at the ${name}`;
+                    document.getElementById('target-desc').innerHTML = getLocationSentence(x, y, name);
+                    panel.classList.remove('hidden');
+                    return;
+                }
+            }
+            panel.classList.add('hidden');
+        }
+
+        function getDistanceToNearest(targetId) {
+            if (!playerPos) return Infinity;
+            let minDist = Infinity;
+            const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+            for(let y=0; y<GRID_SIZE; y++){
+                for(let x=0; x<GRID_SIZE; x++){
+                    if(grid[y][x] === targetId) {
+                        const wX = (x * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                        const wZ = (y * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                        const dist = Math.sqrt(Math.pow(playerPos.x - wX, 2) + Math.pow(playerPos.z - wZ, 2));
+                        if(dist < minDist) minDist = dist;
+                    }
+                }
+            }
+            return minDist;
+        }
+
+        function getGridPosFromWorld(worldPos) {
+            if (!worldPos) return 0;
+            const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+            const x = Math.floor((worldPos.x + offset) / BLOCK_SIZE);
+            const z = Math.floor((worldPos.z + offset) / BLOCK_SIZE);
+            if (x >= 0 && x < GRID_SIZE && z >= 0 && z < GRID_SIZE) return grid[z][x];
+            return 0;
+        }
+
+        function checkMoveMissions() {
+            if(currentMode !== 'guided_move' || currentMissionIndex >= moveMissions.length || !playerPos) return;
+            const m = moveMissions[currentMissionIndex];
+            const dist = getDistanceToNearest(m.targetId);
+            const inObj = getGridPosFromWorld(playerPos);
+
+            if (m.check(dist, inObj, playerPos, moveMissionStartPos)) {
+                document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font text-xl">EXCELLENT!</span>`;
+                currentMissionIndex++;
+                
+                if (currentMissionIndex >= moveMissions.length) {
+                    setTimeout(() => {
+                        document.getElementById('instruction-panel-3d').innerHTML = `<span class="text-green-400 font-bold minecraft-font">ALL 30 MISSIONS COMPLETE! YOU ARE A MASTER!</span>`;
+                        setTimeout(exit3D, 5000);
+                    }, 2000);
+                } else {
+                    setTimeout(() => {
+                        const nextM = moveMissions[currentMissionIndex];
+                        document.getElementById('instruction-panel-3d').innerHTML = nextM.text;
+                        if (playerPos) moveMissionStartPos = playerPos.clone();
+                    }, 2500);
+                }
+            }
+        }
+
+        function animate() {
+            animationFrameId = requestAnimationFrame(animate);
+            if (!playerPos) return;
+
+            const time = performance.now();
+
+            if (controls && controls.isLocked === true) {
+                const delta = (time - prevTime) / 1000;
+                
+                const camDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+                camDir.y = 0; camDir.normalize();
+                const camRight = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+                camRight.y = 0; camRight.normalize();
+
+                const moveVec = new THREE.Vector3();
+                if (moveForward) moveVec.add(camDir);
+                if (moveBackward) moveVec.sub(camDir);
+                if (moveLeft) moveVec.sub(camRight);
+                if (moveRight) moveVec.add(camRight);
+
+                if (moveVec.lengthSq() > 0 && playerMesh) {
+                    moveVec.normalize();
+                    const targetAngle = Math.atan2(moveVec.x, moveVec.z);
+                    let diff = targetAngle - playerMesh.rotation.y;
+                    while(diff < -Math.PI) diff += Math.PI * 2;
+                    while(diff > Math.PI) diff -= Math.PI * 2;
+                    playerMesh.rotation.y += diff * 10 * delta; 
+                    
+                    playerMesh.position.y = Math.sin(time * 0.015) * 0.3; 
+                } else {
+                    if (playerMesh) playerMesh.position.y = 0;
+                }
+
+                const speed = 30.0; 
+                const velocity = moveVec.clone().multiplyScalar(speed * delta);
+                const nextPos = playerPos.clone().add(velocity);
+
+                if (!checkCollisions(nextPos)) {
+                    playerPos.copy(nextPos);
+                } else {
+                    const nextPosX = playerPos.clone(); nextPosX.x += velocity.x;
+                    const nextPosZ = playerPos.clone(); nextPosZ.z += velocity.z;
+                    
+                    if (!checkCollisions(nextPosX)) playerPos.copy(nextPosX);
+                    else if (!checkCollisions(nextPosZ)) playerPos.copy(nextPosZ);
+                }
+
+                if (playerMesh) {
+                    playerMesh.position.x = playerPos.x;
+                    playerMesh.position.z = playerPos.z;
+                }
+
+                const pivotOffset = new THREE.Vector3(0, 6, 0); 
+                const cameraOffset = new THREE.Vector3(0, 2, 16); 
+                
+                cameraOffset.applyQuaternion(camera.quaternion);
+                camera.position.copy(playerPos).add(pivotOffset).add(cameraOffset);
+                if (camera.position.y < 1.0) camera.position.y = 1.0;
+
+                performRaycasting();
+                checkMoveMissions();
+            }
+            prevTime = time;
+            if(renderer && scene && camera) renderer.render(scene, camera);
+        }
+        
+        window.onload = function() {
+            initUI();
+        };
+    </script>
+</body>
+</html>
