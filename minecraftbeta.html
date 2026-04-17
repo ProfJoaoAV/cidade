@@ -74,7 +74,7 @@
         .grid-cell:hover { background-color: rgba(255,255,255,0.5) !important; }
 
         .category-tab {
-            padding: 8px;
+            padding: 6px;
             cursor: pointer;
             border-bottom: 2px solid transparent;
             font-weight: bold;
@@ -244,14 +244,14 @@
             <button onclick="closeStudyRoom()" class="absolute -top-4 -right-4 bg-red-600 text-white border-4 border-red-800 rounded-full w-12 h-12 font-bold text-xl hover:bg-red-500 shadow-lg">X</button>
             
             <div class="flex text-lg bg-[#d7ccc8] rounded-t-lg pt-2 px-2 gap-2">
-                <button onclick="switchStudyTab('places')" id="tab-places" class="study-tab-btn active px-6 py-2 rounded-t-lg">City Places & Shops</button>
+                <button onclick="switchStudyTab('places')" id="tab-places" class="study-tab-btn active px-6 py-2 rounded-t-lg">City Places & Props</button>
                 <button onclick="switchStudyTab('directions')" id="tab-directions" class="study-tab-btn px-6 py-2 rounded-t-lg">Directions & Prepositions</button>
                 <button onclick="switchStudyTab('quiz')" id="tab-quiz" class="study-tab-btn px-6 py-2 rounded-t-lg">⚡ Flash Quiz (Spaced)</button>
             </div>
 
             <div id="content-places" class="flex-grow p-6 overflow-y-auto">
                 <h2 class="text-2xl font-bold mb-4 text-[#c62828] border-b-2 border-[#c62828] pb-2 flex justify-between">
-                    <span>City Places & Shops</span>
+                    <span>City Places & Props</span>
                     <span class="text-sm font-normal text-gray-500 mt-2">Dica: Clica na palavra inglesa para ouvir a pronúncia! 🔊</span>
                 </h2>
                 <div class="grid grid-cols-2 gap-8">
@@ -280,20 +280,25 @@
                         </div>
                     </div>
                     <div>
-                        <h3 class="font-bold text-lg mb-2 text-gray-800">Shops (Lojas)</h3>
+                        <h3 class="font-bold text-lg mb-2 text-gray-800">Shops & Urban Props</h3>
                         <div class="vocab-grid mb-6">
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Bakery')">Bakery</span><span class="vocab-pt">Padaria</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Bookshop')">Bookshop</span><span class="vocab-pt">Livraria</span></div>
-                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Butcher\'s')">Butcher's</span><span class="vocab-pt">Talho</span></div>
-                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Chemist\'s')">Chemist's</span><span class="vocab-pt">Farmácia</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Butcher\\'s')">Butcher's</span><span class="vocab-pt">Talho</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Chemist\\'s')">Chemist's</span><span class="vocab-pt">Farmácia</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Clothes shop')">Clothes shop</span><span class="vocab-pt">Loja de roupa</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Flower shop')">Flower shop</span><span class="vocab-pt">Florista</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Gift shop')">Gift shop</span><span class="vocab-pt">Loja de lembranças</span></div>
-                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Newsagent\'s')">Newsagent's</span><span class="vocab-pt">Quiosque</span></div>
+                            <div class="vocab-item"><span class="vocab-en" onclick="speakText('Newsagent\\'s')">Newsagent's</span><span class="vocab-pt">Quiosque</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Pet shop')">Pet shop</span><span class="vocab-pt">Loja de animais</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Shoe shop')">Shoe shop</span><span class="vocab-pt">Sapataria</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Sports shop')">Sports shop</span><span class="vocab-pt">Loja de desporto</span></div>
                             <div class="vocab-item"><span class="vocab-en" onclick="speakText('Supermarket')">Supermarket</span><span class="vocab-pt">Supermercado</span></div>
+                            <!-- Props Adicionados -->
+                            <div class="vocab-item bg-orange-50"><span class="vocab-en text-orange-700" onclick="speakText('Zebra crossing')">Zebra crossing</span><span class="vocab-pt">Passadeira</span></div>
+                            <div class="vocab-item bg-orange-50"><span class="vocab-en text-orange-700" onclick="speakText('Traffic light')">Traffic light</span><span class="vocab-pt">Semáforo</span></div>
+                            <div class="vocab-item bg-orange-50"><span class="vocab-en text-orange-700" onclick="speakText('Bus stop')">Bus stop</span><span class="vocab-pt">Paragem de autocarro</span></div>
+                            <div class="vocab-item bg-orange-50"><span class="vocab-en text-orange-700" onclick="speakText('Roundabout')">Roundabout</span><span class="vocab-pt">Rotunda</span></div>
                         </div>
                         <h3 class="font-bold text-lg mb-2 text-gray-800">Types of Houses</h3>
                         <div class="vocab-grid">
@@ -382,12 +387,13 @@
         <div class="flex gap-8 w-full max-w-7xl p-4 items-start justify-center h-full pt-16">
             <div class="flex flex-col gap-2 bg-[#3b3b3b] p-4 border-4 border-[#555] border-t-[#aaa] border-l-[#aaa] w-[22rem] h-[80vmin] flex-shrink-0">
                 <h2 class="minecraft-font text-white text-xs text-center mb-2">City Places</h2>
-                <div class="flex text-[10px] mb-2 border-b border-gray-600 overflow-x-auto pb-1 justify-between">
+                <div class="flex text-[10px] mb-2 border-b border-gray-600 overflow-x-auto pb-1 justify-between gap-1">
                     <div class="category-tab active" onclick="setCategory('basic', this)">Basic</div>
                     <div class="category-tab" onclick="setCategory('services', this)">Services</div>
                     <div class="category-tab" onclick="setCategory('shops', this)">Shops</div>
                     <div class="category-tab" onclick="setCategory('leisure', this)">Leisure</div>
                     <div class="category-tab" onclick="setCategory('houses', this)">Houses</div>
+                    <div class="category-tab" onclick="setCategory('props', this)">Props</div>
                 </div>
                 <div id="tools-container" class="grid grid-cols-2 gap-2 overflow-y-auto tools-scroll flex-grow pr-2"></div>
             </div>
@@ -428,7 +434,9 @@
         <div id="start-3d-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 pointer-events-auto">
             <h2 class="minecraft-font text-white text-4xl mb-6 text-center leading-relaxed text-shadow-md text-green-400">Cidade Pronta!</h2>
             <p class="text-white text-lg mb-8 bg-gray-800 p-6 border-4 border-gray-500 text-center rounded">
-                <b>W A S D</b> = Andar<br><b>Rato</b> = Olhar em redor<br><br>
+                <b>W A S D</b> = Andar<br><b>Rato</b> = Olhar em redor<br>
+                <b>Roda do Rato</b> = Zoom In / Out<br>
+                <b>Q / E</b> = Descer / Subir a Câmara<br><br>
                 <span class="text-yellow-400 font-bold block mt-2">Dica: Aponta a cruz para os prédios<br>para veres as preposições a funcionar<br>e ouvires o nome do edifício (Áudio)!</span>
                 <span class="text-green-400 font-bold block mt-4 border-t-2 border-gray-600 pt-4">⚡ NOVO: Preenche os espaços <span class="bg-black text-white px-2 py-1 mx-1 border border-white">[ ___ ]</span><br> usando as teclas 1, 2 e 3 do teclado!</span>
             </p>
@@ -445,17 +453,57 @@
     <div id="canvas-container" class="absolute inset-0 z-10 hidden"></div>
 
     <script>
-        // --- FUNÇÃO DE ÁUDIO (TEXT-TO-SPEECH) ---
+        // --- VARIÁVEIS DA CÂMARA ---
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let moveUp = false, moveDown = false;
+        let camZoom = 30;
+        let camHeight = 14;
+
+        // --- FUNÇÃO DE ÁUDIO AMBIENTE ---
+        let audioCtx = null;
+        let ambientOscillator = null;
+        let ambientGain = null;
+        
+        function initAudio() {
+            if (audioCtx) return;
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+            
+            // Gerar apenas um zumbido ambiente (calmo, simulando vento/cidade ao longe)
+            ambientOscillator = audioCtx.createOscillator();
+            ambientOscillator.type = 'triangle'; // Onda triangular para soar mais natural e suave
+            ambientOscillator.frequency.setValueAtTime(80, audioCtx.currentTime); 
+            
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 300;
+
+            ambientGain = audioCtx.createGain();
+            ambientGain.gain.setValueAtTime(0.04, audioCtx.currentTime); // Volume baixinho
+            
+            // Adicionar uma leve oscilação para o som não ficar estático (efeito de vento)
+            const lfo = audioCtx.createOscillator();
+            lfo.type = 'sine';
+            lfo.frequency.setValueAtTime(0.1, audioCtx.currentTime);
+            const lfoGain = audioCtx.createGain();
+            lfoGain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+            lfo.connect(lfoGain);
+            lfoGain.connect(ambientGain.gain);
+            lfo.start();
+
+            ambientOscillator.connect(filter);
+            filter.connect(ambientGain);
+            ambientGain.connect(audioCtx.destination);
+            ambientOscillator.start();
+        }
+
         function speakText(text, lang = 'en-GB') {
             if (!('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel(); // Parar o que estiver a tocar
-            
-            // Remover tags HTML do texto (ex: <span>)
+            window.speechSynthesis.cancel();
             const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/🔊/g, '').replace(/\[ ___ \]/g, 'blank'); 
-            
             const utter = new SpeechSynthesisUtterance(cleanText);
             utter.lang = lang;
-            utter.rate = 0.9; // Um bocadinho mais lento para alunos perceberem melhor
+            utter.rate = 0.9;
             window.speechSynthesis.speak(utter);
         }
 
@@ -476,7 +524,7 @@
         }
 
 
-        // --- BASE DE DADOS COMPLETA COM REQUISITOS DE ESTRELAS ---
+        // --- BASE DE DADOS COMPLETA COM MOBILIÁRIO URBANO ---
         const BUILDINGS = {
             0: { id: 0, category: 'basic', name: 'Apagar', color: '#ffcccc', icon: '🧽', type: 'floor' },
             1: { id: 1, category: 'basic', name: 'Road', color: '#666666', icon: '🛣️', type: 'road' },
@@ -490,7 +538,7 @@
             8: { id: 8, category: 'services', name: 'Post Office', color: '#e53935', icon: '📮', type: 'building', height: 2.5, style: 'shop_awning' },
             9: { id: 9, category: 'services', name: 'Church', color: '#d7ccc8', icon: '⛪', type: 'building', height: 6, style: 'church' },
             10: { id: 10, category: 'services', name: 'Train Station', color: '#ff9800', icon: '🚉', type: 'building', height: 3, style: 'station' },
-            11: { id: 11, category: 'services', name: 'Airport', color: '#90a4ae', icon: '✈️', type: 'building', height: 3, style: 'modern', reqStars: 15 }, // BLOQUEADO
+            11: { id: 11, category: 'services', name: 'Airport', color: '#90a4ae', icon: '✈️', type: 'building', height: 3, style: 'modern', reqStars: 15 }, 
             
             12: { id: 12, category: 'shops', name: 'Bakery', color: '#ffb300', icon: '🍞', type: 'building', height: 2, style: 'shop_awning' },
             13: { id: 13, category: 'shops', name: 'Supermarket', color: '#00838f', icon: '🛒', type: 'building', height: 3, style: 'shop_glass' },
@@ -503,14 +551,14 @@
             
             20: { id: 20, category: 'leisure', name: 'Cinema', color: '#311b92', icon: '🎬', type: 'building', height: 3.5, style: 'cinema' },
             21: { id: 21, category: 'leisure', name: 'Museum', color: '#eeeeee', icon: '🏛️', type: 'building', height: 4, style: 'columns' },
-            22: { id: 22, category: 'leisure', name: 'Stadium', color: '#43a047', icon: '🏟️', type: 'building', height: 3, style: 'stadium', reqStars: 10 }, // BLOQUEADO
+            22: { id: 22, category: 'leisure', name: 'Stadium', color: '#43a047', icon: '🏟️', type: 'building', height: 3, style: 'stadium', reqStars: 10 }, 
             23: { id: 23, category: 'leisure', name: 'Hotel', color: '#00bcd4', icon: '🏨', type: 'building', height: 7, style: 'hotel' },
             24: { id: 24, category: 'leisure', name: 'Theatre', color: '#b71c1c', icon: '🎭', type: 'building', height: 4, style: 'cinema' },
             
             25: { id: 25, category: 'services', name: 'Café', color: '#8d6e63', icon: '☕', type: 'building', height: 2, style: 'shop_awning' },
             26: { id: 26, category: 'services', name: 'Library', color: '#795548', icon: '📚', type: 'building', height: 3.5, style: 'brick' },
             27: { id: 27, category: 'services', name: 'Restaurant', color: '#e64a19', icon: '🍽️', type: 'building', height: 2.5, style: 'shop_glass' },
-            28: { id: 28, category: 'leisure', name: 'Zoo', color: '#2e7d32', icon: '🦁', type: 'nature', height: 0.1, reqStars: 20 }, // BLOQUEADO
+            28: { id: 28, category: 'leisure', name: 'Zoo', color: '#2e7d32', icon: '🦁', type: 'nature', height: 0.1, reqStars: 20 }, 
             29: { id: 29, category: 'shops', name: 'Bookshop', color: '#5d4037', icon: '📖', type: 'building', height: 2.5, style: 'shop_awning' },
             30: { id: 30, category: 'shops', name: 'Gift shop', color: '#d81b60', icon: '🎁', type: 'building', height: 2, style: 'shop_colorful' },
             31: { id: 31, category: 'shops', name: 'Pet shop', color: '#00838f', icon: '🐾', type: 'building', height: 2, style: 'shop_awning' },
@@ -521,7 +569,13 @@
             36: { id: 36, category: 'houses', name: 'Detached house', color: '#fff59d', icon: '🏠', type: 'building', height: 2.5, style: 'normal' },
             37: { id: 37, category: 'houses', name: 'Semi-detached', color: '#ffcc80', icon: '🏘️', type: 'building', height: 2.5, style: 'normal' },
             38: { id: 38, category: 'houses', name: 'Terraced house', color: '#ef9a9a', icon: '🏘️', type: 'building', height: 2.5, style: 'brick' },
-            39: { id: 39, category: 'houses', name: 'Skyscraper', color: '#90caf9', icon: '🏙️', type: 'building', height: 12, style: 'hotel', reqStars: 30 }, // BLOQUEADO
+            39: { id: 39, category: 'houses', name: 'Skyscraper', color: '#90caf9', icon: '🏙️', type: 'building', height: 12, style: 'hotel', reqStars: 30 },
+            
+            // Novos Adereços (Urban Props)
+            40: { id: 40, category: 'props', name: 'Zebra crossing', color: '#aaaaaa', icon: '🚸', type: 'road_special', style: 'zebra' },
+            41: { id: 41, category: 'props', name: 'Traffic light', color: '#424242', icon: '🚥', type: 'prop', style: 'traffic_light' },
+            42: { id: 42, category: 'props', name: 'Bus stop', color: '#1976d2', icon: '🚏', type: 'prop', style: 'bus_stop' },
+            43: { id: 43, category: 'props', name: 'Roundabout', color: '#555555', icon: '🔄', type: 'road_special', style: 'roundabout' }
         };
 
         const GRID_SIZE = 20;
@@ -533,7 +587,9 @@
         
         let scene, camera, renderer, controls;
         let gameBlocks = [];
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let cityVehicles = []; 
+        window.cityNPCs = []; // Variável para os NPCs animáveis
+        window.sidewalkNodes = []; // Pontos de navegação nos passeios
         let prevTime = 0;
         let playerPos = null; 
         let playerMesh = null;
@@ -641,7 +697,7 @@
             document.getElementById('content-' + tabName).classList.remove('hidden');
         }
 
-        // --- FLASH QUIZ (ESPAÇADO) ---
+        // --- FLASH QUIZ ---
         const QUIZ_WORDS = [
             {en:'Airport',pt:'Aeroporto',icon:'✈️'},{en:'Bank',pt:'Banco',icon:'💰'},{en:'Café',pt:'Café',icon:'☕'},
             {en:'Church',pt:'Igreja',icon:'⛪'},{en:'Cinema',pt:'Cinema',icon:'🎬'},{en:'Fire station',pt:'Quartel de bombeiros',icon:'🚒'},
@@ -660,7 +716,9 @@
             {en:'Block of flats',pt:'Prédio',icon:'🏢'},{en:'Caravan',pt:'Rulote',icon:'🚐'},{en:'Cottage',pt:'Casa de campo',icon:'🏡'},
             {en:'Detached house',pt:'Vivenda',icon:'🏠'},{en:'Semi-detached',pt:'Geminada',icon:'🏘️'},{en:'Terraced house',pt:'Banda',icon:'🏘️'},
             {en:'Skyscraper',pt:'Arranha-céus',icon:'🏙️'},{en:'Gift shop',pt:'Loja de lembranças',icon:'🎁'},{en:'Pet shop',pt:'Loja de animais',icon:'🐾'},
-            {en:'Shoe shop',pt:'Sapataria',icon:'👞'}
+            {en:'Shoe shop',pt:'Sapataria',icon:'👞'},
+            {en:'Zebra crossing',pt:'Passadeira',icon:'🚸'}, {en:'Traffic light',pt:'Semáforo',icon:'🚥'}, 
+            {en:'Bus stop',pt:'Paragem de autocarro',icon:'🚏'}, {en:'Roundabout',pt:'Rotunda',icon:'🔄'}
         ];
 
         let quizDeck = [];
@@ -700,7 +758,6 @@
             
             updateQuizScore();
             
-            // Falar automaticamente se a pergunta for em Inglês
             if (quizMode === 'EN_PT') speakText(quizCurrent.en);
         }
 
@@ -714,7 +771,6 @@
             document.getElementById('quiz-card-hint').textContent = '';
             document.getElementById('quiz-answer-btns').classList.remove('hidden');
             
-            // Falar a resposta se estiver a traduzir para Inglês
             if (quizMode === 'PT_EN') speakText(quizCurrent.en);
         }
 
@@ -722,7 +778,6 @@
             if (correct) {
                 quizCorrect++;
             } else {
-                // SISTEMA LEITNER ESPAÇADO: Se errar, volta a baralhar nas próximas 3 ou 4 cartas
                 const insertIdx = Math.max(0, quizDeck.length - Math.floor(Math.random() * 3) - 1);
                 quizDeck.splice(insertIdx, 0, quizCurrent);
                 showToast("Carta inserida no baralho!", "#f44336");
@@ -825,15 +880,13 @@
         function clearGrid() {
             grid = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(0));
             
-            // Garantir que existe sempre um espaço de "spawn" livre (estrada) no Free Build
             if (currentMode === 'free') {
                 for (let y = 9; y <= 11; y++) {
                     for (let x = 9; x <= 11; x++) {
-                        grid[y][x] = 1; // 1 = Road
+                        grid[y][x] = 1; 
                     }
                 }
             }
-            
             renderGrid();
         }
 
@@ -853,11 +906,10 @@
             if (mode === 'free') {
                 panel.classList.add('hidden');
                 clearGrid();
-                renderTools(); // Atualizar os locks
+                renderTools(); 
             } else if (mode === 'guided_place') {
                 panel.classList.remove('hidden');
                 missionStars = prog.builderStars || {};
-                // Retomar na missão guardada, se existir
                 const savedMission = prog.builderMission || 0;
                 currentMissionIndex = (savedMission < placeMissions.length) ? savedMission : 0;
                 loadPlaceMission();
@@ -897,8 +949,6 @@
             
             m.setup();
             saveProgress();
-            
-            // LER MISSÃO AUTOMATICAMENTE
             speakText(m.text);
         }
 
@@ -906,7 +956,6 @@
             if(placeMissions[currentMissionIndex].check()) {
                 missionAttempts++;
                 const stars = calcStars(missionAttempts);
-                // Guardar melhor pontuação (não sobrescrever com pior)
                 if (!missionStars[currentMissionIndex] || stars > missionStars[currentMissionIndex]) {
                     missionStars[currentMissionIndex] = stars;
                 }
@@ -928,7 +977,6 @@
                     }
                 }, 3000);
             } else {
-                // Feedback de erro formativo e inteligente
                 missionAttempts++;
                 const fb = document.getElementById('mission-feedback');
                 if (fb) {
@@ -1003,18 +1051,14 @@
             const listenBtn = `<button onclick="speakText('${m.text}')" class="absolute -top-4 right-0 text-3xl bg-blue-600 rounded-full w-12 h-12 flex items-center justify-center border-2 border-white hover:scale-110 pointer-events-auto shadow-xl text-white">🔊</button>`;
             document.getElementById('instruction-panel-3d').innerHTML = m.text + listenBtn;
             if (playerPos) moveMissionStartPos = playerPos.clone();
-            
-            // Falar Missão automaticamente
             speakText(m.text);
         }
 
-        // Utilitário para criar missões de forma limpa
         function createHStreet(y, startX, endX) { for(let i=startX; i<=endX; i++) grid[y][i] = 1; }
         function createVStreet(x, startY, endY) { for(let i=startY; i<=endY; i++) grid[i][x] = 1; }
 
         // --- 30 MISSÕES DE CONSTRUÇÃO (BUILDER) ---
         const placeMissions = [
-            // FÁCIL (1-10) - Colocar 1 edifício com preposições simples
             { text: "<span class='level-badge lvl-easy'>Easy 1/10</span><br>Find the <span class='highlight-place'>Bank</span>. Put a <span class='highlight-place'>Bakery</span> <span class='highlight-prep'>next to</span> it.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 7; renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => checkAdjacency(12, 7) },
             { text: "<span class='level-badge lvl-easy'>Easy 2/10</span><br>We have a <span class='highlight-place'>Hospital</span> and a <span class='highlight-place'>Supermarket</span>. Put a <span class='highlight-place'>Chemist's</span> <span class='highlight-prep'>between</span> them.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][8] = 4; grid[9][12] = 13; renderGrid(); setCategory('shops'); currentTool = 15; renderTools(); }, check: () => checkBetween(15, 4, 13) },
             { text: "<span class='level-badge lvl-easy'>Easy 3/10</span><br>Find the <span class='highlight-place'>Park</span>. Put a <span class='highlight-place'>Cinema</span> <span class='highlight-prep'>opposite</span> the Park (across the road).", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 2; renderGrid(); setCategory('leisure'); currentTool = 20; renderTools(); }, check: () => checkOpposite(20, 2, 1) },
@@ -1026,7 +1070,7 @@
             { text: "<span class='level-badge lvl-easy'>Easy 9/10</span><br>Put the <span class='highlight-place'>Police Station</span> <span class='highlight-prep'>next to</span> the <span class='highlight-place'>Hospital</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 4; renderGrid(); setCategory('services'); currentTool = 5; renderTools(); }, check: () => checkAdjacency(5, 4) },
             { text: "<span class='level-badge lvl-easy'>Easy 10/10</span><br>Put a <span class='highlight-place'>Museum</span> <span class='highlight-prep'>opposite</span> the <span class='highlight-place'>School</span>.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 3; renderGrid(); setCategory('leisure'); currentTool = 21; renderTools(); }, check: () => checkOpposite(21, 3, 1) },
             
-            // MÉDIO (11-20) - Colocar 2 edifícios, cruzamentos, corners
+            // MÉDIO (11-20)
             { text: "<span class='level-badge lvl-medium'>Medium 11/20</span><br>We have a crossroad! Put a <span class='highlight-place'>Newsagent's</span> <span class='highlight-prep'>on the corner</span> (top-left).", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 18; renderTools(); }, check: () => grid[9][9] === 18 },
             { text: "<span class='level-badge lvl-medium'>Medium 12/20</span><br>Put a <span class='highlight-place'>Butcher's</span> <span class='highlight-prep'>next to</span> the <span class='highlight-place'>Bakery</span>, and a <span class='highlight-place'>Chemist's</span> <span class='highlight-prep'>next to</span> the Butcher's.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][8] = 12; renderGrid(); setCategory('shops'); currentTool = 14; renderTools(); }, check: () => checkAdjacency(14, 12) && checkAdjacency(15, 14) },
             { text: "<span class='level-badge lvl-medium'>Medium 13/20</span><br>Put a <span class='highlight-place'>Park</span>. Then put a <span class='highlight-place'>School</span> <span class='highlight-prep'>opposite</span> the Park.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => checkOpposite(3, 2, 1) },
@@ -1038,9 +1082,9 @@
             { text: "<span class='level-badge lvl-medium'>Medium 19/20</span><br>Put a <span class='highlight-place'>Supermarket</span> <span class='highlight-prep'>opposite</span> the <span class='highlight-place'>School</span>, and a <span class='highlight-place'>Bakery</span> <span class='highlight-prep'>next to</span> the Supermarket.", setup: () => { clearGrid(); createHStreet(10, 4, 16); grid[9][10] = 3; renderGrid(); setCategory('shops'); currentTool = 13; renderTools(); }, check: () => checkOpposite(13, 3, 1) && checkAdjacency(12, 13) },
             { text: "<span class='level-badge lvl-medium'>Medium 20/20</span><br>Put the <span class='highlight-place'>Airport</span>. Put a <span class='highlight-place'>Hotel</span> <span class='highlight-prep'>opposite</span> the Airport.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 11; renderTools(); }, check: () => checkOpposite(23, 11, 1) },
 
-            // DIFÍCIL (21-30) - Mais contexto, múltiplas colocações
-            { text: "<span class='level-badge lvl-hard'>Hard 21/30</span><br>Build a Shopping Street! Place a <span class='highlight-place'>Bakery</span>, a <span class='highlight-place'>Clothes Shop</span>, and a <span class='highlight-place'>Chemist's</span> side-by-side (next to each other).", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => (checkAdjacency(12, 16) && checkAdjacency(16, 15)) || (checkAdjacency(16, 12) && checkAdjacency(12, 15)) || (checkAdjacency(12, 15) && checkAdjacency(15, 16)) },
-            { text: "<span class='level-badge lvl-hard'>Hard 22/30</span><br>Place the <span class='highlight-place'>Hospital</span>. Put the <span class='highlight-place'>Police Station</span> <span class='highlight-prep'>next to</span> it, and the <span class='highlight-place'>Fire Station</span> <span class='highlight-prep'>next to</span> the Police Station — an emergency row!", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 4; renderTools(); }, check: () => checkAdjacency(4, 5) && checkAdjacency(5, 6) },
+            // DIFÍCIL (21-30)
+            { text: "<span class='level-badge lvl-hard'>Hard 21/30</span><br>Build a Shopping Street! Place a <span class='highlight-place'>Bakery</span>, a <span class='highlight-place'>Clothes Shop</span>, and a <span class='highlight-place'>Chemist's</span> side-by-side.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('shops'); currentTool = 12; renderTools(); }, check: () => (checkAdjacency(12, 16) && checkAdjacency(16, 15)) || (checkAdjacency(16, 12) && checkAdjacency(12, 15)) || (checkAdjacency(12, 15) && checkAdjacency(15, 16)) },
+            { text: "<span class='level-badge lvl-hard'>Hard 22/30</span><br>Place the <span class='highlight-place'>Hospital</span>. Put the <span class='highlight-place'>Police Station</span> <span class='highlight-prep'>next to</span> it, and the <span class='highlight-place'>Fire Station</span> <span class='highlight-prep'>next to</span> the Police Station.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 4; renderTools(); }, check: () => checkAdjacency(4, 5) && checkAdjacency(5, 6) },
             { text: "<span class='level-badge lvl-hard'>Hard 23/30</span><br>Place a <span class='highlight-place'>Park</span>. Put a <span class='highlight-place'>Museum</span> <span class='highlight-prep'>behind</span> it, and a <span class='highlight-place'>Cinema</span> <span class='highlight-prep'>next to</span> the Museum.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => { let p=getCoordsOf(2); return p.length>0 && grid[p[0].y-1][p[0].x]===21 && checkAdjacency(20, 21); } },
             { text: "<span class='level-badge lvl-hard'>Hard 24/30</span><br>Fill the corners! Put a <span class='highlight-place'>Bank</span> (top-left), a <span class='highlight-place'>Post Office</span> (top-right), and a <span class='highlight-place'>Police Station</span> (bottom-left).", setup: () => { clearGrid(); createHStreet(10, 4, 16); createVStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 7; renderTools(); }, check: () => grid[9][9]===7 && grid[9][11]===8 && grid[11][9]===5 },
             { text: "<span class='level-badge lvl-hard'>Hard 25/30</span><br>Put a <span class='highlight-place'>School</span>. Put a <span class='highlight-place'>Park</span> <span class='highlight-prep'>opposite</span> the School, and a <span class='highlight-place'>Library</span> (Museum icon) <span class='highlight-prep'>next to</span> the School.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('services'); currentTool = 3; renderTools(); }, check: () => checkOpposite(2, 3, 1) && checkAdjacency(21, 3) },
@@ -1051,7 +1095,7 @@
             { text: "<span class='level-badge lvl-hard'>Hard 30/30</span><br>The Ultimate City Block! Place a <span class='highlight-place'>Park</span>. Put a <span class='highlight-place'>Bakery</span> <span class='highlight-prep'>next to</span> the Park, and a <span class='highlight-place'>Bank</span> <span class='highlight-prep'>opposite</span> the Bakery.", setup: () => { clearGrid(); createHStreet(10, 4, 16); renderGrid(); setCategory('basic'); currentTool = 2; renderTools(); }, check: () => checkAdjacency(12, 2) && checkOpposite(7, 12, 1) }
         ];
 
-        // --- MAPA DA MEGA CIDADE PARA A MISSÃO EXPLORER ---
+        // --- MAPA DA MEGA CIDADE PARA A MISSÃO EXPLORER COM PROPS ---
         function setupAdventureMap() {
             clearGrid();
             // Ruas (Grelha 3x3)
@@ -1063,50 +1107,57 @@
             // Centro (Parque Gigante)
             for(let y=7; y<=13; y++) for(let x=7; x<=13; x++) grid[y][x] = 2;
 
-            // Quarteirão NW (Serviços)
+            // Cruzamentos (Rotundas e Passadeiras)
+            grid[6][6] = 43; // Roundabout
+            grid[14][14] = 43; // Roundabout
+            grid[6][5] = 40; grid[6][7] = 40; // Zebra
+            
+            // Quarteirão NW
             grid[5][4] = 3; // School
-            grid[5][5] = 21; // Museum (Library)
+            grid[5][5] = 21; // Museum
             grid[4][5] = 8; // Post Office
+            grid[5][6] = 41; // Traffic light (na berma)
 
-            // Quarteirão N (Lojas)
-            grid[5][7] = 13; // Supermarket (Corner)
+            // Quarteirão N
+            grid[5][7] = 13; // Supermarket
             grid[5][9] = 12; // Bakery
             grid[5][11] = 14; // Butcher
-            grid[5][13] = 15; // Chemist (Corner)
+            grid[5][13] = 15; // Chemist
+            grid[5][10] = 42; // Bus stop frente à padaria
 
-            // Quarteirão NE (Emergência)
-            grid[5][15] = 4; // Hospital (Corner)
+            // Quarteirão NE
+            grid[5][15] = 4; // Hospital
             grid[4][15] = 5; // Police
             grid[3][15] = 6; // Fire Station
 
-            // Quarteirão W (Lazer e Lojas)
-            grid[7][5] = 20; // Cinema (Corner)
+            // Quarteirão W
+            grid[7][5] = 20; // Cinema
             grid[9][5] = 24; // Theatre
             grid[11][5] = 16; // Clothes Shop
 
-            // Quarteirão E (Desporto e Viagem)
-            grid[7][15] = 22; // Stadium (Corner)
+            // Quarteirão E
+            grid[7][15] = 22; // Stadium
             grid[9][15] = 19; // Sports Shop
             grid[11][15] = 11; // Airport
+            grid[10][15] = 42; // Bus stop perto do aeroporto
 
-            // Quarteirão SW (Transportes)
-            grid[15][5] = 10; // Train Station (Corner)
+            // Quarteirão SW
+            grid[15][5] = 10; // Train Station
             grid[15][4] = 35; // Cottage
             grid[16][5] = 33; // Block of flats
 
-            // Quarteirão S (Negócios)
-            grid[15][7] = 7; // Bank (Corner)
+            // Quarteirão S
+            grid[15][7] = 7; // Bank
             grid[15][9] = 18; // Newsagent
-            grid[15][13] = 23; // Hotel (Corner)
+            grid[15][13] = 23; // Hotel
 
-            // Quarteirão SE (Religião e Flores)
-            grid[15][15] = 9; // Church (Corner)
+            // Quarteirão SE
+            grid[15][15] = 9; // Church
             grid[16][15] = 17; // Flower Shop
         }
 
-        // --- 30 MISSÕES DE MOVIMENTO (EXPLORER) - Rota Gigante Pela Cidade ---
+        // --- 30 MISSÕES DE MOVIMENTO (EXPLORER) ---
         const moveMissions = [
-            // FÁCIL (1-10) - Andar a direito ou virar 1 vez
             { text: "<span class='level-badge lvl-easy'>Easy 1/10</span><br>Go <span class='highlight-prep'>straight ahead</span>. The <span class='highlight-place'>Hospital</span> is <span class='highlight-prep'>on your right</span>. Go there!", targetId: 4, check: (dist) => dist < 18 },
             { text: "<span class='level-badge lvl-easy'>Easy 2/10</span><br>Walk <span class='highlight-prep'>past</span> the Hospital. Find the <span class='highlight-place'>Police Station</span> <span class='highlight-prep'>next to</span> it.", targetId: 5, check: (dist) => dist < 15 },
             { text: "<span class='level-badge lvl-easy'>Easy 3/10</span><br>Go back to the crossroads. <span class='highlight-prep'>Turn right</span> and find the <span class='highlight-place'>Chemist's</span> <span class='highlight-prep'>on the corner</span>.", targetId: 15, check: (dist) => dist < 18 },
@@ -1118,7 +1169,6 @@
             { text: "<span class='level-badge lvl-easy'>Easy 9/10</span><br>Exit the Park on the other side. Find the <span class='highlight-place'>Bank</span>.", targetId: 7, check: (dist) => dist < 15 },
             { text: "<span class='level-badge lvl-easy'>Easy 10/10</span><br>Walk <span class='highlight-prep'>past</span> the Bank to find the <span class='highlight-place'>Train Station</span> <span class='highlight-prep'>on the corner</span>.", targetId: 10, check: (dist) => dist < 18 },
             
-            // MÉDIO (11-20) - Cruzamentos, primeira/segunda rua
             { text: "<span class='level-badge lvl-medium'>Medium 11/20</span><br><span class='highlight-prep'>Turn left</span> at the crossroads. Find the <span class='highlight-place'>School</span>.", targetId: 3, check: (dist) => dist < 20 },
             { text: "<span class='level-badge lvl-medium'>Medium 12/20</span><br>Go <span class='highlight-prep'>straight ahead</span>. Take the <span class='highlight-prep'>first road on the left</span>. Find the <span class='highlight-place'>Post Office</span>.", targetId: 8, check: (dist) => dist < 18 },
             { text: "<span class='level-badge lvl-medium'>Medium 13/20</span><br>Turn around! Walk <span class='highlight-prep'>towards</span> the <span class='highlight-place'>Museum</span>.", targetId: 21, check: (dist) => dist < 15 },
@@ -1130,7 +1180,6 @@
             { text: "<span class='level-badge lvl-medium'>Medium 19/20</span><br>Walk <span class='highlight-prep'>past</span> the Church to buy some flowers at the <span class='highlight-place'>Flower Shop</span>.", targetId: 17, check: (dist) => dist < 15 },
             { text: "<span class='level-badge lvl-medium'>Medium 20/20</span><br>Turn around. Take the <span class='highlight-prep'>first road on the right</span> to the <span class='highlight-place'>Airport</span>.", targetId: 11, check: (dist) => dist < 18 },
 
-            // DIFÍCIL (21-30) - Instruções compostas
             { text: "<span class='level-badge lvl-hard'>Hard 21/30</span><br>Walk <span class='highlight-prep'>past</span> the Airport. The <span class='highlight-place'>Sports Shop</span> is <span class='highlight-prep'>on your right</span>.", targetId: 19, check: (dist) => dist < 15 },
             { text: "<span class='level-badge lvl-hard'>Hard 22/30</span><br>Go <span class='highlight-prep'>straight ahead</span>. The <span class='highlight-place'>Stadium</span> is <span class='highlight-prep'>on the corner</span>.", targetId: 22, check: (dist) => dist < 18 },
             { text: "<span class='level-badge lvl-hard'>Hard 23/30</span><br><span class='highlight-prep'>Cross</span> the street and walk <span class='highlight-prep'>through</span> the <span class='highlight-place'>Park</span> again. 🌳", targetId: 2, check: (dist, inObj) => inObj === 2 },
@@ -1157,73 +1206,108 @@
 
         function getGrassTexture() {
             return createMinecraftTexture(512, (ctx, s) => {
-                const baseColor = '#558b2f';
-                ctx.fillStyle = baseColor;
-                ctx.fillRect(0, 0, s, s);
-                
+                ctx.fillStyle = '#558b2f'; ctx.fillRect(0, 0, s, s);
                 const colors = ['#33691e', '#689f38', '#4caf50', '#7cb342'];
-                const noiseSize = 4; // Tamanho muito mais fino para não ficar pixelizado
-                for(let y=0; y<s; y+=noiseSize) {
-                    for(let x=0; x<s; x+=noiseSize) {
+                for(let y=0; y<s; y+=4) {
+                    for(let x=0; x<s; x+=4) {
                         if(Math.random() > 0.4) {
                             ctx.fillStyle = colors[Math.floor(Math.random()*colors.length)];
-                            ctx.fillRect(x, y, noiseSize, noiseSize);
+                            ctx.fillRect(x, y, 4, 4);
                         }
                     }
                 }
-                
-                // Detalhes da relva/flores mais detalhados
-                ctx.fillStyle = '#8bc34a';
-                for(let i=0; i<800; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 5, 5);
-                ctx.fillStyle = '#cddc39'; // Flores amarelas
-                for(let i=0; i<200; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
-                ctx.fillStyle = '#fff59d'; // Flores brancas
-                for(let i=0; i<100; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 3, 3);
+                ctx.fillStyle = '#8bc34a'; for(let i=0; i<800; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 5, 5);
+                ctx.fillStyle = '#cddc39'; for(let i=0; i<200; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+                ctx.fillStyle = '#fff59d'; for(let i=0; i<100; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 3, 3);
             });
         }
 
-        function getRoadTexture() {
-            return createMinecraftTexture(256, (ctx, s) => {
-                ctx.fillStyle = '#555555'; 
-                ctx.fillRect(0,0,s,s);
-                
-                // Ruído do asfalto
-                ctx.fillStyle = '#4a4a4a';
-                for(let i=0; i<2000; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
-                ctx.fillStyle = '#666666';
-                for(let i=0; i<2000; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+        // Helper para desenhar passeios contextualizados
+        function drawSidewalkHelper(ctx, x, y, w, h, edge) {
+            ctx.fillStyle = '#b0bec5'; ctx.fillRect(x,y,w,h);
+            ctx.fillStyle = '#90a4ae';
+            for(let i=x; i<x+w; i+=10) { ctx.fillRect(i, y, 2, h); }
+            for(let i=y; i<y+h; i+=10) { ctx.fillRect(x, i, w, 2); }
+            ctx.fillStyle = '#dddddd';
+            if(edge==='top') ctx.fillRect(x, y+h-4, w, 4);
+            if(edge==='bottom') ctx.fillRect(x, y, w, 4);
+            if(edge==='left') ctx.fillRect(x+w-4, y, 4, h);
+            if(edge==='right') ctx.fillRect(x, y, 4, h);
+        }
 
-                // Passeios (bermas)
-                ctx.fillStyle = '#333333'; 
-                ctx.fillRect(0, 0, s, 24); 
-                ctx.fillRect(0, s-24, s, 24);
-                ctx.fillRect(0, 0, 24, s); 
-                ctx.fillRect(s-24, 0, 24, s);
-                
-                // Textura das bermas
-                ctx.fillStyle = '#222222';
-                for(let i=0; i<s; i+=32) {
-                    ctx.fillRect(i, 0, 2, 24);
-                    ctx.fillRect(i, s-24, 2, 24);
-                    ctx.fillRect(0, i, 24, 2);
-                    ctx.fillRect(s-24, i, 24, 2);
-                }
+        const roadTextureCache = {};
+        function getContextualRoadTexture(nRoad, sRoad, eRoad, wRoad) {
+            const key = `road_${nRoad}_${sRoad}_${eRoad}_${wRoad}`;
+            if(roadTextureCache[key]) return roadTextureCache[key];
 
-                // Linha tracejada do meio
+            const tex = createMinecraftTexture(256, (ctx, s) => {
+                ctx.fillStyle = '#4a4a4a'; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = '#3d3d3d'; for(let i=0; i<3000; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+
+                const sw = 40; 
+                // Se NÃO houver estrada adjacente, desenha o passeio desse lado
+                if(!nRoad) drawSidewalkHelper(ctx, 0, 0, s, sw, 'top');
+                if(!sRoad) drawSidewalkHelper(ctx, 0, s-sw, s, sw, 'bottom');
+                if(!wRoad) drawSidewalkHelper(ctx, 0, 0, sw, s, 'left');
+                if(!eRoad) drawSidewalkHelper(ctx, s-sw, 0, sw, s, 'right');
+
                 ctx.fillStyle = '#ffffff';
-                const dashLength = 48;
-                const gap = 32;
-                const lineWidth = 12;
+                const dashLength = 40; const gap = 20; const lineWidth = 8;
                 
-                for(let i=0; i<s; i+=(dashLength+gap)) {
-                    ctx.fillRect(i, s/2 - lineWidth/2, dashLength, lineWidth); // Horizontal
-                    ctx.fillRect(s/2 - lineWidth/2, i, lineWidth, dashLength); // Vertical
+                if(nRoad && sRoad && !eRoad && !wRoad) {
+                    for(let i=0; i<s; i+=(dashLength+gap)) ctx.fillRect(s/2 - lineWidth/2, i, lineWidth, dashLength);
+                } else if(eRoad && wRoad && !nRoad && !sRoad) {
+                    for(let i=0; i<s; i+=(dashLength+gap)) ctx.fillRect(i, s/2 - lineWidth/2, dashLength, lineWidth);
                 }
-                
-                // Limpar cruzamento
-                ctx.fillStyle = '#555555';
-                ctx.fillRect(s/2 - lineWidth/2, s/2 - lineWidth/2, lineWidth, lineWidth);
             });
+            roadTextureCache[key] = tex;
+            return tex;
+        }
+
+        function getContextualZebraTexture(nRoad, sRoad, eRoad, wRoad) {
+            const key = `zebra_${nRoad}_${sRoad}_${eRoad}_${wRoad}`;
+            if(roadTextureCache[key]) return roadTextureCache[key];
+
+            const tex = createMinecraftTexture(256, (ctx, s) => {
+                ctx.fillStyle = '#4a4a4a'; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = '#3d3d3d'; for(let i=0; i<3000; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+
+                const sw = 40; 
+                if(!nRoad) drawSidewalkHelper(ctx, 0, 0, s, sw, 'top');
+                if(!sRoad) drawSidewalkHelper(ctx, 0, s-sw, s, sw, 'bottom');
+                if(!wRoad) drawSidewalkHelper(ctx, 0, 0, sw, s, 'left');
+                if(!eRoad) drawSidewalkHelper(ctx, s-sw, 0, sw, s, 'right');
+
+                ctx.fillStyle = '#ffffff';
+                if(nRoad || sRoad) {
+                    for(let x=sw+10; x<s-sw-10; x+=25) ctx.fillRect(x, 20, 15, s-40);
+                } else {
+                    for(let y=sw+10; y<s-sw-10; y+=25) ctx.fillRect(20, y, s-40, 15);
+                }
+            });
+            roadTextureCache[key] = tex;
+            return tex;
+        }
+
+        function getContextualRoundaboutTexture(nRoad, sRoad, eRoad, wRoad) {
+            const key = `round_${nRoad}_${sRoad}_${eRoad}_${wRoad}`;
+            if(roadTextureCache[key]) return roadTextureCache[key];
+
+            const tex = createMinecraftTexture(256, (ctx, s) => {
+                ctx.fillStyle = '#4a4a4a'; ctx.fillRect(0,0,s,s);
+                ctx.fillStyle = '#3d3d3d'; for(let i=0; i<3000; i++) ctx.fillRect(Math.random()*s, Math.random()*s, 4, 4);
+
+                const sw = 40; 
+                if(!nRoad) drawSidewalkHelper(ctx, 0, 0, s, sw, 'top');
+                if(!sRoad) drawSidewalkHelper(ctx, 0, s-sw, s, sw, 'bottom');
+                if(!wRoad) drawSidewalkHelper(ctx, 0, 0, sw, s, 'left');
+                if(!eRoad) drawSidewalkHelper(ctx, s-sw, 0, sw, s, 'right');
+
+                ctx.strokeStyle = 'white'; ctx.lineWidth = 6;
+                ctx.beginPath(); ctx.arc(s/2, s/2, 60, 0, Math.PI*2); ctx.stroke();
+            });
+            roadTextureCache[key] = tex;
+            return tex;
         }
 
         function getBuildingTexture(bData) {
@@ -1257,7 +1341,7 @@
                     ctx.fillStyle = '#ccc'; ctx.fillRect(0, 0, s, 8);
                     ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fillRect(0, 8, s, 12);
                 } else if (style === 'brick_big_door') { 
-                    ctx.fillStyle = '#333'; ctx.fillRect(6, 12, 20, 20); ctx.fillStyle = '#fbc02d'; ctx.fillRect(6, 12, 20, 2); 
+                    ctx.fillStyle = '#333'; ctx.fillRect(6, 12, 20, 20); ctx.fillStyle = '#fbcbc02d'; ctx.fillRect(6, 12, 20, 2); 
                 } else if (style === 'church') {
                     ctx.fillStyle = '#81d4fa'; ctx.fillRect(12, 10, 8, 16);
                     ctx.fillStyle = '#ffeb3b'; ctx.fillRect(14, 2, 4, 8); ctx.fillRect(12, 4, 8, 2);
@@ -1297,7 +1381,178 @@
             });
         }
 
-        // --- SISTEMA 3D COM SOMBRAS ---
+        function createTextSprite(message, icon) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512; canvas.height = 128;
+            
+            context.fillStyle = "rgba(0, 0, 0, 0.6)";
+            context.fillRect(0, 0, 512, 128);
+            context.strokeStyle = "white"; context.lineWidth = 4; context.strokeRect(0, 0, 512, 128);
+
+            context.font = "Bold 40px 'Courier New'"; context.fillStyle = "white";
+            context.textAlign = "center"; context.textBaseline = "middle";
+            context.fillText(icon + " " + message, 256, 64);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false }); 
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(10, 2.5, 1);
+            return sprite;
+        }
+
+        // Criar Carros em Formato Voxel - Metade do tamanho e andam do lado direito da estrada!
+        function createVehicle(color) {
+            const container = new THREE.Group();
+            const car = new THREE.Group();
+            
+            car.position.set(-1.5, 0, 0); 
+
+            const bodyMat = new THREE.MeshStandardMaterial({ color: color });
+            const windowMat = new THREE.MeshStandardMaterial({color: 0x81d4fa, transparent: true, opacity: 0.7});
+            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            
+            const body = new THREE.Mesh(new THREE.BoxGeometry(2, 0.8, 3.5), bodyMat);
+            body.position.y = 0.7; body.castShadow = true;
+            const top = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.6, 2), windowMat);
+            top.position.set(0, 1.4, -0.2); top.castShadow = true;
+            
+            car.add(body, top);
+            
+            const wheelPositions = [[-1.1, 0.3, 1], [1.1, 0.3, 1], [-1.1, 0.3, -1], [1.1, 0.3, -1]];
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.3, 16), wheelMat);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(...pos);
+                wheel.castShadow = true;
+                car.add(wheel);
+            });
+            
+            container.add(car);
+            return container;
+        }
+
+        // --- SISTEMA DE RECUO SEGURO (FALLBACKS PROCEDURAIS) PARA NPC E PLAYER ---
+        function createProceduralNPCFallback(colorHex) {
+            const fallbackGroup = new THREE.Group();
+            const skinMat = new THREE.MeshLambertMaterial({color: 0xe0ac69}); 
+            const shirtMat = new THREE.MeshLambertMaterial({color: colorHex}); 
+            const pantsMat = new THREE.MeshLambertMaterial({color: 0x222222}); 
+            
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), skinMat);
+            head.position.y = 2.8; head.castShadow = true;
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.4), shirtMat);
+            body.position.y = 1.8; body.castShadow = true;
+            const armL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.4), skinMat);
+            armL.position.set(-0.55, 1.8, 0); armL.castShadow = true;
+            const armR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.4), skinMat);
+            armR.position.set(0.55, 1.8, 0); armR.castShadow = true;
+            const legL = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.2, 0.4), pantsMat);
+            legL.position.set(-0.2, 0.6, 0); legL.castShadow = true;
+            const legR = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.2, 0.4), pantsMat);
+            legR.position.set(0.2, 0.6, 0); legR.castShadow = true;
+
+            fallbackGroup.add(head, body, armL, armR, legL, legR);
+            fallbackGroup.scale.set(4.5, 4.5, 4.5); 
+            const fallbackBox = new THREE.Box3().setFromObject(fallbackGroup);
+            fallbackGroup.position.y = -fallbackBox.min.y;
+            
+            return fallbackGroup;
+        }
+
+        // --- CARREGAR NPCS NAS RUAS COM FALLBACK ---
+        function loadNPCs() {
+            if(window.cityNPCs) window.cityNPCs.forEach(n => scene.remove(n.mesh));
+            window.cityNPCs = [];
+            if (!window.sidewalkNodes || window.sidewalkNodes.length === 0) return;
+
+            const loader = new THREE.GLTFLoader();
+            const models = [
+                { url: 'https://profjoaoav.github.io/cidade/Petra.glb', color: 0xff4444 },
+                { url: 'https://profjoaoav.github.io/cidade/tomas.glb', color: 0x4444ff }
+            ];
+
+            models.forEach(m => {
+                const startNode = window.sidewalkNodes[Math.floor(Math.random() * window.sidewalkNodes.length)];
+                
+                const npcContainer = new THREE.Group();
+                npcContainer.add(createProceduralNPCFallback(m.color)); // Carrega imediatamente a versão de blocos
+                npcContainer.position.copy(startNode.pos);
+                scene.add(npcContainer);
+                
+                window.cityNPCs.push({
+                    mesh: npcContainer,
+                    currentNode: startNode,
+                    targetNode: startNode,
+                    speed: 2 + Math.random()*1.5
+                });
+
+                loader.load(m.url, (gltf) => {
+                    const model = gltf.scene;
+                    model.scale.set(6.5, 6.5, 6.5);
+                    model.updateMatrixWorld(true);
+                    const box = new THREE.Box3().setFromObject(model);
+                    model.position.y = -box.min.y;
+                    
+                    model.traverse(c => { if(c.isMesh) { c.castShadow=true; c.receiveShadow=true; }});
+                    
+                    npcContainer.clear();
+                    npcContainer.add(model); // Substitui silenciosamente pelo modelo 3D quando estiver pronto
+                }, undefined, function() {
+                    // Ocultar erros ruidosos caso o ficheiro não esteja disponível. A versão procedural já está visível.
+                });
+            });
+        }
+
+        function createProceduralPlayer() {
+            const playerGroup = new THREE.Group();
+            
+            // Boneco processual de fallback (garante que o jogador existe sempre mal o jogo arranca)
+            const fallbackGroup = createProceduralNPCFallback(0x00aaff);
+            playerGroup.add(fallbackGroup);
+
+            // Tentar Carregar modelo GLB suavemente
+            const loader = new THREE.GLTFLoader();
+            loader.load(CHARACTER_MODELS[currentCharacter], function(gltf) {
+                const model = gltf.scene;
+                model.scale.set(7.5, 7.5, 7.5); 
+                
+                model.updateMatrixWorld(true);
+                const box = new THREE.Box3().setFromObject(model);
+                model.position.y = -box.min.y; 
+                model.rotation.y = Math.PI; 
+                
+                model.traverse(function(node) {
+                    if (node.isMesh) {
+                        node.castShadow = true;
+                        node.receiveShadow = true;
+                    }
+                });
+                
+                playerGroup.clear();
+                playerGroup.add(model); // Substitui a versão procedural silenciosamente
+            }, undefined, function() {
+                // Erros ignorados silenciosamente (isTrusted)
+            });
+
+            return playerGroup;
+        }
+
+        function createProceduralTree() {
+            const tree = new THREE.Group();
+            const woodTex = getWoodTexture();
+            const leafTex = getLeafTexture();
+            
+            const trunk = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 2), new THREE.MeshStandardMaterial({map: woodTex}));
+            trunk.position.y = 2; trunk.castShadow = true; trunk.receiveShadow = true;
+            const leaves = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 6), new THREE.MeshStandardMaterial({map: leafTex}));
+            leaves.position.y = 7; leaves.castShadow = true; leaves.receiveShadow = true;
+            
+            tree.add(trunk, leaves);
+            return tree;
+        }
+
+        // --- SISTEMA 3D E VEÍCULOS ---
         function init3D() {
             if(scene) return; 
             scene = new THREE.Scene();
@@ -1332,7 +1587,10 @@
             if (typeof THREE !== 'undefined' && typeof THREE.PointerLockControls !== 'undefined') {
                 controls = new THREE.PointerLockControls(camera, renderer.domElement);
                 
-                document.getElementById('btn-lock-pointer').addEventListener('click', () => controls.lock());
+                document.getElementById('btn-lock-pointer').addEventListener('click', () => {
+                    initAudio(); 
+                    controls.lock();
+                });
 
                 controls.addEventListener('lock', () => {
                     document.getElementById('start-3d-overlay').classList.add('hidden');
@@ -1357,126 +1615,51 @@
                 scene.add(controls.getObject());
             }
 
+            // Escutador da roda do rato para fazer Zoom
+            document.addEventListener('wheel', (e) => {
+                if (controls && controls.isLocked) {
+                    camZoom += e.deltaY * 0.05;
+                    if (camZoom < 0) camZoom = 0; // Se ficar em 0 entra em visão de Primeira Pessoa
+                    if (camZoom > 150) camZoom = 150; // Limite de afastamento
+                }
+            });
+
             const onKeyDown = (e) => {
                 switch(e.code){ 
                     case 'ArrowUp': case 'KeyW': moveForward = true; break; 
                     case 'ArrowLeft': case 'KeyA': moveLeft = true; break; 
                     case 'ArrowDown': case 'KeyS': moveBackward = true; break; 
                     case 'ArrowRight': case 'KeyD': moveRight = true; break; 
+                    case 'KeyQ': moveDown = true; break; // Descer a câmara
+                    case 'KeyE': moveUp = true; break;   // Subir a câmara
                     case 'Digit1': case 'Numpad1': if(currentQuiz) submitQuizAnswer(0); break;
                     case 'Digit2': case 'Numpad2': if(currentQuiz) submitQuizAnswer(1); break;
                     case 'Digit3': case 'Numpad3': if(currentQuiz) submitQuizAnswer(2); break;
                 }
             };
             const onKeyUp = (e) => {
-                switch(e.code){ case 'ArrowUp': case 'KeyW': moveForward = false; break; case 'ArrowLeft': case 'KeyA': moveLeft = false; break; case 'ArrowDown': case 'KeyS': moveBackward = false; break; case 'ArrowRight': case 'KeyD': moveRight = false; break; }
+                switch(e.code){ 
+                    case 'ArrowUp': case 'KeyW': moveForward = false; break; 
+                    case 'ArrowLeft': case 'KeyA': moveLeft = false; break; 
+                    case 'ArrowDown': case 'KeyS': moveBackward = false; break; 
+                    case 'ArrowRight': case 'KeyD': moveRight = false; break; 
+                    case 'KeyQ': moveDown = false; break; 
+                    case 'KeyE': moveUp = false; break; 
+                }
             };
             document.addEventListener('keydown', onKeyDown); document.addEventListener('keyup', onKeyUp);
             window.addEventListener('resize', onWindowResize);
         }
 
-        function createTextSprite(message, icon) {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 512; canvas.height = 128;
-            
-            context.fillStyle = "rgba(0, 0, 0, 0.6)";
-            context.fillRect(0, 0, 512, 128);
-            context.strokeStyle = "white"; context.lineWidth = 4; context.strokeRect(0, 0, 512, 128);
-
-            context.font = "Bold 40px 'Courier New'"; context.fillStyle = "white";
-            context.textAlign = "center"; context.textBaseline = "middle";
-            context.fillText(icon + " " + message, 256, 64);
-            
-            const texture = new THREE.CanvasTexture(canvas);
-            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false }); 
-            const sprite = new THREE.Sprite(spriteMaterial);
-            sprite.scale.set(10, 2.5, 1);
-            return sprite;
-        }
-
-        function createProceduralPlayer() {
-            const playerGroup = new THREE.Group();
-            
-            // Carregar modelo GLB
-            const loader = new THREE.GLTFLoader();
-            loader.load(CHARACTER_MODELS[currentCharacter], function(gltf) {
-                const model = gltf.scene;
-                // Escala do jogador ainda maior face aos edifícios
-                model.scale.set(7.5, 7.5, 7.5); 
-                
-                // Forçar a atualização das matrizes para calcular a Bounding Box real
-                model.updateMatrixWorld(true);
-                const box = new THREE.Box3().setFromObject(model);
-                
-                // Elevar o modelo exatamente pela altura da sua base para que os pés fiquem em Y=0
-                model.position.y = -box.min.y; 
-                
-                model.rotation.y = Math.PI; // Virar de costas para a câmara
-                
-                model.traverse(function(node) {
-                    if (node.isMesh) {
-                        node.castShadow = true;
-                        node.receiveShadow = true;
-                    }
-                });
-                
-                // Remover o boneco processual antigo e adicionar o GLB novo
-                playerGroup.clear();
-                playerGroup.add(model);
-            }, undefined, function(error) {
-                console.error(`Erro a carregar ${currentCharacter}`, error);
-            });
-
-            // Boneco processual de fallback (enquanto carrega ou caso falhe)
-            const skinMat = new THREE.MeshLambertMaterial({color: 0xe0ac69}); 
-            const shirtMat = new THREE.MeshLambertMaterial({color: 0x00aaff}); 
-            const pantsMat = new THREE.MeshLambertMaterial({color: 0x0000aa}); 
-            
-            const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), skinMat);
-            head.position.y = 2.8; head.castShadow = true;
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.4), shirtMat);
-            body.position.y = 1.8; body.castShadow = true;
-            const armL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.4), skinMat);
-            armL.position.set(-0.55, 1.8, 0); armL.castShadow = true;
-            const armR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.2, 0.4), skinMat);
-            armR.position.set(0.55, 1.8, 0); armR.castShadow = true;
-            const legL = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.2, 0.4), pantsMat);
-            legL.position.set(-0.2, 0.6, 0); legL.castShadow = true;
-            const legR = new THREE.Mesh(new THREE.BoxGeometry(0.38, 1.2, 0.4), pantsMat);
-            legR.position.set(0.2, 0.6, 0); legR.castShadow = true;
-
-            const fallbackGroup = new THREE.Group();
-            fallbackGroup.add(head, body, armL, armR, legL, legR);
-            fallbackGroup.scale.set(4.5, 4.5, 4.5); // Aumentado também face à escala do jogo
-            
-            // Ajustar altura do fallback para não ficar enterrado
-            const fallbackBox = new THREE.Box3().setFromObject(fallbackGroup);
-            fallbackGroup.position.y = -fallbackBox.min.y;
-            
-            playerGroup.add(fallbackGroup);
-
-            return playerGroup;
-        }
-
-        function createProceduralTree() {
-            const tree = new THREE.Group();
-            const woodTex = getWoodTexture();
-            const leafTex = getLeafTexture();
-            
-            const trunk = new THREE.Mesh(new THREE.BoxGeometry(2, 4, 2), new THREE.MeshStandardMaterial({map: woodTex}));
-            trunk.position.y = 2; trunk.castShadow = true; trunk.receiveShadow = true;
-            const leaves = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 6), new THREE.MeshStandardMaterial({map: leafTex}));
-            leaves.position.y = 7; leaves.castShadow = true; leaves.receiveShadow = true;
-            
-            tree.add(trunk, leaves);
-            return tree;
-        }
-
         function buildCity3D() {
             gameBlocks.forEach(b => scene.remove(b));
+            cityVehicles.forEach(v => scene.remove(v));
+            if(window.cityNPCs) window.cityNPCs.forEach(n => scene.remove(n.mesh));
+            
             if (playerMesh) scene.remove(playerMesh);
             gameBlocks = [];
+            cityVehicles = [];
+            window.sidewalkNodes = [];
 
             const grassTex = getGrassTexture();
             grassTex.repeat.set(GRID_SIZE, GRID_SIZE); grassTex.wrapS = THREE.RepeatWrapping; grassTex.wrapT = THREE.RepeatWrapping;
@@ -1489,21 +1672,20 @@
             scene.add(floor);
 
             const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
-            const roadTex = getRoadTexture();
 
             if (!playerPos) playerPos = new THREE.Vector3(0, 0, 0);
             
             if(currentMode === 'guided_move') {
-                // Iniciar perto do Hospital (X=15, Y=6) virado para Norte
                 playerPos.set( (14 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2), 0, (17 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2) );
             } else {
-                // Posicionar precisamente no meio do bloco 10,10 (garantindo que é na praça gerada)
                 playerPos.set( (10 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2), 0, (10 * BLOCK_SIZE) - offset + (BLOCK_SIZE/2) ); 
             }
             
             playerMesh = createProceduralPlayer();
             if(currentMode === 'guided_move') playerMesh.rotation.y = Math.PI; 
             scene.add(playerMesh);
+
+            const roadTiles = [];
 
             for (let y = 0; y < GRID_SIZE; y++) {
                 for (let x = 0; x < GRID_SIZE; x++) {
@@ -1514,15 +1696,80 @@
                     const posX = (x * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
                     const posZ = (y * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
 
-                    if (bData.type === 'road') {
+                    if (bData.type === 'road' || bData.type === 'road_special') {
+                        roadTiles.push({x, z: y});
+                        
+                        const isNR = [1,40,43].includes(grid[y-1]?.[x]);
+                        const isSR = [1,40,43].includes(grid[y+1]?.[x]);
+                        const isER = [1,40,43].includes(grid[y][x+1]);
+                        const isWR = [1,40,43].includes(grid[y][x-1]);
+                        
+                        // Guardar nós de passeio para os NPCs andarem
+                        if(!isNR) window.sidewalkNodes.push({pos: new THREE.Vector3(posX, 0, posZ - BLOCK_SIZE/2 + 2)});
+                        if(!isSR) window.sidewalkNodes.push({pos: new THREE.Vector3(posX, 0, posZ + BLOCK_SIZE/2 - 2)});
+                        if(!isWR) window.sidewalkNodes.push({pos: new THREE.Vector3(posX - BLOCK_SIZE/2 + 2, 0, posZ)});
+                        if(!isER) window.sidewalkNodes.push({pos: new THREE.Vector3(posX + BLOCK_SIZE/2 - 2, 0, posZ)});
+
                         const geo = new THREE.PlaneGeometry(BLOCK_SIZE, BLOCK_SIZE);
-                        const mat = new THREE.MeshStandardMaterial({ map: roadTex });
+                        let tex;
+                        if(bData.style === 'zebra') tex = getContextualZebraTexture(isNR, isSR, isER, isWR);
+                        else if(bData.style === 'roundabout') tex = getContextualRoundaboutTexture(isNR, isSR, isER, isWR);
+                        else tex = getContextualRoadTexture(isNR, isSR, isER, isWR);
+                        
+                        const mat = new THREE.MeshStandardMaterial({ map: tex });
                         const mesh = new THREE.Mesh(geo, mat);
                         mesh.rotation.x = -Math.PI / 2; mesh.position.set(posX, 0.05, posZ);
                         mesh.receiveShadow = true;
+                        
+                        if(bData.style === 'zebra' && grid[y][x-1] > 1) mesh.rotation.z = Math.PI/2; 
+                        
                         scene.add(mesh);
                         mesh.userData = { id: id, x, y };
                         gameBlocks.push(mesh);
+                        
+                        if (bData.style === 'roundabout') {
+                            const islGeo = new THREE.CylinderGeometry(1.5, 1.5, 0.6, 16);
+                            const islMat = new THREE.MeshStandardMaterial({ color: 0x4caf50 });
+                            const island = new THREE.Mesh(islGeo, islMat);
+                            island.position.set(posX, 0.3, posZ);
+                            island.castShadow = true;
+                            scene.add(island);
+                        }
+
+                    } else if (bData.type === 'prop') {
+                        const propGroup = new THREE.Group();
+                        propGroup.position.set(posX, 0, posZ);
+                        
+                        if (bData.style === 'traffic_light') {
+                            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 6), new THREE.MeshStandardMaterial({color: 0x777777}));
+                            pole.position.y = 3;
+                            const box = new THREE.Mesh(new THREE.BoxGeometry(1, 2.5, 1), new THREE.MeshStandardMaterial({color: 0x222222}));
+                            box.position.y = 5.5;
+                            const lr = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.1), new THREE.MeshBasicMaterial({color: 0xff0000})); lr.position.set(0, 6.2, 0);
+                            const ly = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.1), new THREE.MeshBasicMaterial({color: 0xffff00})); ly.position.set(0, 5.5, 0);
+                            const lg = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.1), new THREE.MeshBasicMaterial({color: 0x00ff00})); lg.position.set(0, 4.8, 0);
+                            propGroup.add(pole, box, lr, ly, lg);
+                        } 
+                        else if (bData.style === 'bus_stop') {
+                            const roof = new THREE.Mesh(new THREE.BoxGeometry(5, 0.2, 3), new THREE.MeshStandardMaterial({color: 0x1976d2}));
+                            roof.position.y = 3.5;
+                            const back = new THREE.Mesh(new THREE.BoxGeometry(4.8, 3.5, 0.2), new THREE.MeshStandardMaterial({color: 0x81d4fa, transparent: true, opacity: 0.4}));
+                            back.position.set(0, 1.75, -1.3);
+                            const bench = new THREE.Mesh(new THREE.BoxGeometry(3, 0.4, 1), new THREE.MeshStandardMaterial({color: 0x8d6e63}));
+                            bench.position.set(0, 1, -0.5);
+                            propGroup.add(roof, back, bench);
+                        }
+                        
+                        propGroup.castShadow = true;
+                        scene.add(propGroup);
+
+                        const hitGeo = new THREE.BoxGeometry(4, 8, 4);
+                        const hitMesh = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({visible:false}));
+                        hitMesh.position.set(posX, 4, posZ);
+                        hitMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon, quizSolved: false }; 
+                        scene.add(hitMesh);
+                        gameBlocks.push(hitMesh);
+
                     } else if (bData.type === 'nature') {
                         const baseGeo = new THREE.BoxGeometry(BLOCK_SIZE, 0.1, BLOCK_SIZE);
                         const baseMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32 });
@@ -1539,7 +1786,7 @@
                         const hitGeo = new THREE.BoxGeometry(2, 10, 2);
                         const hitMesh = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({visible:false}));
                         hitMesh.position.set(posX, 5, posZ);
-                        hitMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon }; 
+                        hitMesh.userData = { id: id, isSolid: true, x, y, name: bData.name, icon: bData.icon, quizSolved: false }; 
                         scene.add(hitMesh);
                         gameBlocks.push(hitMesh);
                         
@@ -1563,6 +1810,29 @@
                     }
                 }
             }
+
+            // Gerar Frota de Carros
+            const numCars = Math.min(10, Math.floor(roadTiles.length / 3));
+            const carColors = [0xe53935, 0x1e88e5, 0x43a047, 0xfdd835, 0x8e24aa, 0xff9800];
+            for(let i=0; i<numCars; i++) {
+                const tile = roadTiles[Math.floor(Math.random() * roadTiles.length)];
+                const car = createVehicle(carColors[i % carColors.length]);
+                const px = (tile.x * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                const pz = (tile.z * BLOCK_SIZE) - offset + (BLOCK_SIZE / 2);
+                car.position.set(px, 0, pz);
+                
+                const dirs = [new THREE.Vector3(1,0,0), new THREE.Vector3(-1,0,0), new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,-1)];
+                car.userData = { 
+                    direction: dirs[Math.floor(Math.random()*dirs.length)], 
+                    maxSpeed: 12 + Math.random()*6,
+                    speed: 12 
+                };
+                scene.add(car);
+                cityVehicles.push(car);
+            }
+            
+            loadNPCs();
+
             camera.rotation.set(0, 0, 0);
         }
 
@@ -1603,7 +1873,7 @@
 
         // --- SISTEMAS DE NAVEGAÇÃO E RAYCASTING INTELIGENTE ---
         function checkCollisions(newPosition) {
-            const playerRadius = 2.5; // Hitbox aumentada devido ao novo tamanho do jogador
+            const playerRadius = 2.5;
             for (let i = 0; i < gameBlocks.length; i++) {
                 if (!gameBlocks[i].userData.isSolid) continue;
                 const box = new THREE.Box3().setFromObject(gameBlocks[i]);
@@ -1615,7 +1885,6 @@
             return false;
         }
         
-        // Função para generar um quiz interativo baseado na localização
         function generateQuizFor(gridX, gridY, targetName) {
             const pX = Math.floor((playerPos.x + (GRID_SIZE * BLOCK_SIZE)/2) / BLOCK_SIZE);
             const pZ = Math.floor((playerPos.z + (GRID_SIZE * BLOCK_SIZE)/2) / BLOCK_SIZE);
@@ -1635,10 +1904,10 @@
             };
             
             let opposites = [];
-            if (neighbors.N === 1 && neighbors.NN > 1) opposites.push(BUILDINGS[neighbors.NN].name);
-            if (neighbors.S === 1 && neighbors.SS > 1) opposites.push(BUILDINGS[neighbors.SS].name);
-            if (neighbors.E === 1 && neighbors.EE > 1) opposites.push(BUILDINGS[neighbors.EE].name);
-            if (neighbors.W === 1 && neighbors.WW > 1) opposites.push(BUILDINGS[neighbors.WW].name);
+            if ([1,40,43].includes(neighbors.N) && neighbors.NN > 1) opposites.push(BUILDINGS[neighbors.NN].name);
+            if ([1,40,43].includes(neighbors.S) && neighbors.SS > 1) opposites.push(BUILDINGS[neighbors.SS].name);
+            if ([1,40,43].includes(neighbors.E) && neighbors.EE > 1) opposites.push(BUILDINGS[neighbors.EE].name);
+            if ([1,40,43].includes(neighbors.W) && neighbors.WW > 1) opposites.push(BUILDINGS[neighbors.WW].name);
             
             let adjacents = [];
             if (neighbors.N > 1) adjacents.push({id: neighbors.N, dir: 'N'});
@@ -1647,7 +1916,7 @@
             if (neighbors.W > 1) adjacents.push({id: neighbors.W, dir: 'W'});
             
             let adjNames = [...new Set(adjacents.map(a => BUILDINGS[a.id].name))];
-            let isCorner = (neighbors.N===1||neighbors.S===1) && (neighbors.E===1||neighbors.W===1);
+            let isCorner = ([1,40,43].includes(neighbors.N)|| [1,40,43].includes(neighbors.S)) && ([1,40,43].includes(neighbors.E)|| [1,40,43].includes(neighbors.W));
 
             let correctPrep = "";
             let endText = "";
@@ -1665,7 +1934,6 @@
                 correctPrep = "on the corner";
                 endText = ``;
             } else {
-                // Verificar se está Behind / In Front of
                 if (Math.abs(dx) > Math.abs(dz)) {
                     const dirX = Math.sign(dx);
                     const behindX = gridX + dirX; 
@@ -1698,7 +1966,6 @@
             return { sentenceTemplate, correctPrep, options, endText };
         }
 
-        // --- SISTEMA DE RESPOSTAS 3D QUIZ ---
         let currentLookedObject = null;
         let currentQuiz = null;
 
@@ -1712,10 +1979,8 @@
                 saveProgress();
                 updateMenuStars();
                 
-                // Marcar este objecto como resolvido para não voltar a perguntar
                 currentLookedObject.userData.quizSolved = true;
                 
-                // Mostrar a frase completa e esconder os botões
                 document.getElementById('target-desc').innerHTML = currentQuiz.sentenceTemplate.replace('[ ___ ]', `<span class="text-green-400 bg-transparent border-0 px-0 inline">${currentQuiz.correctPrep}</span>`);
                 document.getElementById('quiz-buttons').classList.add('hidden');
                 document.getElementById('quiz-hint').classList.add('hidden');
@@ -1752,14 +2017,12 @@
                         
                         document.getElementById('target-name').innerText = `${icon} You are looking at the ${name}`;
                         
-                        // Preparar o Quiz se ainda não foi resolvido
-                        if (!object.userData.quizSolved) {
+                        if (!object.userData.quizSolved && object.userData.id > 2 && object.userData.id < 40) {
                             currentQuiz = generateQuizFor(x, y, name);
                         } else {
                             currentQuiz = null;
                         }
 
-                        // Mostrar o modo correto (Quiz ou Frase Normal)
                         if (currentQuiz) {
                             document.getElementById('target-desc').innerHTML = currentQuiz.sentenceTemplate;
                             document.getElementById('quiz-btn-1').innerText = `1. ${currentQuiz.options[0]}`;
@@ -1768,15 +2031,13 @@
                             
                             btnContainer.classList.remove('hidden');
                             hint.classList.remove('hidden');
-                            
                             speakText(`Where is the ${name}?`);
                         } else {
-                            // Usamos uma versão simples do generate para mostrar a frase final caso resolvido ou se for "isolated"
                             let tempQuiz = generateQuizFor(x, y, name);
                             if (tempQuiz) {
                                 document.getElementById('target-desc').innerHTML = tempQuiz.sentenceTemplate.replace('[ ___ ]', `<span class="text-green-400 bg-transparent border-0 px-0 inline">${tempQuiz.correctPrep}</span>`);
                             } else {
-                                document.getElementById('target-desc').innerHTML = "It is isolated.";
+                                document.getElementById('target-desc').innerHTML = "It is here.";
                             }
                             btnContainer.classList.add('hidden');
                             hint.classList.add('hidden');
@@ -1852,7 +2113,6 @@
             }
         }
 
-        // --- SISTEMA DE MINIMAPA ---
         function updateMinimap() {
             const canvas = document.getElementById('minimap');
             if(!canvas || !playerPos || !playerMesh) return;
@@ -1863,7 +2123,6 @@
             ctx.clearRect(0, 0, w, h);
             const cellSize = w / GRID_SIZE;
 
-            // Desenhar Edifícios
             for(let y=0; y<GRID_SIZE; y++){
                 for(let x=0; x<GRID_SIZE; x++){
                     const id = grid[y][x];
@@ -1874,17 +2133,14 @@
                 }
             }
 
-            // Desenhar Jogador
             const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
             const px = (playerPos.x + offset) / BLOCK_SIZE;
             const py = (playerPos.z + offset) / BLOCK_SIZE;
 
             ctx.save();
             ctx.translate(px * cellSize, py * cellSize);
-            // Aplicar a rotação do jogador (ajustada para o canvas 2D)
             ctx.rotate(-playerMesh.rotation.y + Math.PI);
             
-            // Seta vermelha indicando a posição e a direção
             ctx.fillStyle = '#ff0000';
             ctx.beginPath();
             ctx.moveTo(0, -6);
@@ -1914,8 +2170,10 @@
                 if (moveBackward) moveVec.sub(camDir);
                 if (moveLeft) moveVec.sub(camRight);
                 if (moveRight) moveVec.add(camRight);
+                
+                const isMoving = moveVec.lengthSq() > 0;
 
-                if (moveVec.lengthSq() > 0 && playerMesh) {
+                if (isMoving && playerMesh) {
                     moveVec.normalize();
                     const targetAngle = Math.atan2(moveVec.x, moveVec.z);
                     let diff = targetAngle - playerMesh.rotation.y;
@@ -1927,6 +2185,12 @@
                 } else {
                     playerMesh.position.y = 0;
                 }
+
+                // Ajustar altura da câmara (Q/E)
+                if (moveUp) camHeight += 20 * delta;
+                if (moveDown) camHeight -= 20 * delta;
+                if (camHeight < 2) camHeight = 2; // Altura mínima (nível do chão)
+                if (camHeight > 100) camHeight = 100; // Altura máxima
 
                 const speed = 30.0; 
                 const velocity = moveVec.clone().multiplyScalar(speed * delta);
@@ -1945,11 +2209,83 @@
                 if (playerMesh) {
                     playerMesh.position.x = playerPos.x;
                     playerMesh.position.z = playerPos.z;
+                    
+                    // Esconder o avatar se o zoom for 0 (Modo 1ª Pessoa)
+                    if (camZoom < 3) {
+                        playerMesh.visible = false;
+                    } else {
+                        playerMesh.visible = true;
+                    }
                 }
 
-                // Ajustar a câmara para suportar um jogador muito maior (olhando por cima e ligeiramente atrás)
-                const pivotOffset = new THREE.Vector3(0, 14, 0); 
-                const cameraOffset = new THREE.Vector3(0, 5, 30); 
+                // IA dos Veículos
+                const offset = (GRID_SIZE * BLOCK_SIZE) / 2;
+                cityVehicles.forEach(car => {
+                    const distToPlayer = car.position.distanceTo(playerPos);
+                    const targetSpeed = distToPlayer < 25 ? 0 : car.userData.maxSpeed;
+                    car.userData.speed += (targetSpeed - car.userData.speed) * 0.1; 
+
+                    const moveDist = car.userData.speed * delta;
+                    car.position.addScaledVector(car.userData.direction, moveDist);
+                    
+                    car.rotation.y = Math.atan2(car.userData.direction.x, car.userData.direction.z);
+                    
+                    const gridX = Math.floor((car.position.x + offset) / BLOCK_SIZE);
+                    const gridZ = Math.floor((car.position.z + offset) / BLOCK_SIZE);
+                    
+                    const aheadX = Math.floor((car.position.x + car.userData.direction.x * (BLOCK_SIZE*0.6) + offset) / BLOCK_SIZE);
+                    const aheadZ = Math.floor((car.position.z + car.userData.direction.z * (BLOCK_SIZE*0.6) + offset) / BLOCK_SIZE);
+                    
+                    const isRoadAhead = (aheadX >= 0 && aheadX < GRID_SIZE && aheadZ >= 0 && aheadZ < GRID_SIZE) && 
+                                        ([1,40,43].includes(grid[aheadZ][aheadX]));
+                                        
+                    if (!isRoadAhead) {
+                        car.position.x = (gridX * BLOCK_SIZE) - offset + (BLOCK_SIZE/2);
+                        car.position.z = (gridZ * BLOCK_SIZE) - offset + (BLOCK_SIZE/2);
+                        
+                        const cw = new THREE.Vector3(car.userData.direction.z, 0, -car.userData.direction.x);
+                        const ccw = new THREE.Vector3(-car.userData.direction.z, 0, car.userData.direction.x);
+                        
+                        const canGoCW = (gridZ + Math.sign(cw.z) >= 0 && gridZ + Math.sign(cw.z) < GRID_SIZE && gridX + Math.sign(cw.x) >= 0 && gridX + Math.sign(cw.x) < GRID_SIZE) && 
+                                        [1,40,43].includes(grid[gridZ + Math.sign(cw.z)][gridX + Math.sign(cw.x)]);
+                        const canGoCCW = (gridZ + Math.sign(ccw.z) >= 0 && gridZ + Math.sign(ccw.z) < GRID_SIZE && gridX + Math.sign(ccw.x) >= 0 && gridX + Math.sign(ccw.x) < GRID_SIZE) && 
+                                        [1,40,43].includes(grid[gridZ + Math.sign(ccw.z)][gridX + Math.sign(ccw.x)]);
+                        
+                        if (canGoCW && canGoCCW) car.userData.direction = Math.random() > 0.5 ? cw : ccw;
+                        else if (canGoCW) car.userData.direction = cw;
+                        else if (canGoCCW) car.userData.direction = ccw;
+                        else car.userData.direction.negate(); 
+                    }
+                });
+
+                // IA dos NPCs a andar
+                if (window.cityNPCs) {
+                    window.cityNPCs.forEach(npc => {
+                        const dist = npc.mesh.position.distanceTo(npc.targetNode.pos);
+                        if(dist < 0.5) {
+                            const neighbors = window.sidewalkNodes.filter(n => n !== npc.currentNode && n.pos.distanceTo(npc.targetNode.pos) > 0.1 && n.pos.distanceTo(npc.targetNode.pos) < 15);
+                            if(neighbors.length > 0) {
+                                npc.currentNode = npc.targetNode;
+                                npc.targetNode = neighbors[Math.floor(Math.random() * neighbors.length)];
+                            } else {
+                                npc.targetNode = npc.currentNode; // voltar atrás se ficar preso
+                            }
+                        } else {
+                            const dir = new THREE.Vector3().subVectors(npc.targetNode.pos, npc.mesh.position).normalize();
+                            npc.mesh.position.addScaledVector(dir, npc.speed * delta);
+                            
+                            const targetAngle = Math.atan2(dir.x, dir.z);
+                            let diff = targetAngle - npc.mesh.rotation.y;
+                            while(diff < -Math.PI) diff += Math.PI * 2;
+                            while(diff > Math.PI) diff -= Math.PI * 2;
+                            npc.mesh.rotation.y += diff * 10 * delta;
+                        }
+                    });
+                }
+
+                // Cálculo Dinâmico da Câmara baseado no Zoom e Altura
+                const pivotOffset = new THREE.Vector3(0, camHeight, 0); 
+                const cameraOffset = new THREE.Vector3(0, 0, camZoom); 
                 
                 cameraOffset.applyQuaternion(camera.quaternion);
                 camera.position.copy(playerPos).add(pivotOffset).add(cameraOffset);
